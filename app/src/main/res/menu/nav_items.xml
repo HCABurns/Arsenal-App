@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/home_nav_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:icon="@android:drawable/ic_dialog_alert"
+        android:title="@string/home_nav" />
+    <item
+        android:id="@+id/recent_nav_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:icon="@android:drawable/ic_menu_view"
+        android:title="@string/next_nav" />
+
+    <item
+        android:id="@+id/invisible"
+        android:visible="false" />
+</menu>
