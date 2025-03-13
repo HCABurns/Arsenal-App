@@ -1,3 +1,16 @@
 <resources>
     <string name="app_name">Arsenal_App</string>
+
+    <string name="title">Arsenal</string>
+
+    //Nav Bar
+    <string name="home_nav">Home</string>
+    <string name="next_nav">Recent</string>
+
+    // Home Screen
+    <string name="logo_desc">Logo Image</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+
 </resources>
