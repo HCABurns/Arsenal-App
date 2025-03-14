@@ -1,15 +1,13 @@
 # Required Imports
 import re
 import requests
-import base64
 from bs4 import BeautifulSoup as bs
-
+import base64
 from firebase_admin import credentials,db,initialize_app
 
 # Define URL to be scraped
-#url = "https://www.google.com/search?q=arsenal+fixture"
 url = "https://www.arsenal.com/fixtures"
-
+img_url = "https://www.arsenal.com"
 
 # Get data html from the page.
 data = requests.get(url).text
@@ -18,68 +16,56 @@ data = requests.get(url).text
 soup = bs(data, 'html.parser')
 
 # Get the information in the div and classes required:
-#div = soup.find_all('div', class_='card fixture-card fixture-card--full-card fixture-card--is-link')
-#div = soup.find_all('div', class_='accordions')
 div = soup.find('div', class_='accordion__content')
-#div = soup.find_all('div', class_='card fixture-card fixture-card--full-card fixture-card--is-link')
 
 
-#######################
-# Upcoming Match Info #
-#######################
+##########################################
+# Get next X games that are to be played #
+##########################################
 
-img_url = "https://www.arsenal.com"
+# Competition, Opponent Name, Date, Time, Stadium, opponent badge base64
+games_amount = 4
+games = [[] for i in range(games_amount)]
 
-time = re.search(r'<time datetime="[\d\S]*"', str(div))
+# Get the information from the web page.
+data = str(soup.find_all('div', class_='accordions'))
+opponent = re.findall(r'<div class="team-crest__name-value">[(\d\w )]*', data)
+times = re.findall(r'<time datetime="[\d\S]*"', data)
+location = re.findall(r'<div class="event-info__venue">[\w.\-\' ]*', data)
+badges = re.findall(r'class="team-crest__crest" src="[\S]*.\/>', data)
+competition = re.findall(r'<div class="event-info__extra">[(\d\w )]*', data)
 
-t = time[0].split('"')[1]
-date, time = t.split("T")
+# Extract the information for each game and store.
+for i in range(games_amount):
 
-print("Date:",date)
-print("Time:",time[:-1])
+    # Add competition
+    games[i].append(competition[i].split(">")[1])
 
-location = re.search(r'<div class="event-info__venue">[(\d\w )]*', str(div))
-location = location[0].split(">")[1]
-print("Stadium:",location)
+    # Add opponent and whether Arsenal are home or away.
+    t1 = opponent[i*2].split(">")[1]
+    t2 = opponent[i*2+1].split(">")[1]
+    opp = [t1,t2][t1=="Arsenal"]
+    home = [True,False][t1=="Arsenal"]
+    games[i].append(opp + [" (H)", " (A)"][home])
 
-competition = re.search(r'<div class="event-info__extra">[(\d\w )]*', str(div))
-competition = competition[0].split(">")[1]
-print("Competition:",competition)
+    # Add date of the match.
+    date, time = times[i].split('"')[1].split("T")
+    games[i].append(date)
 
-opponent = re.findall(r'<div class="team-crest__name-value">[(\d\w )]*', str(div))
-t1 = opponent[0].split(">")[1]
-t2 = opponent[1].split(">")[1]
-opponent = [t1,t2][t1=="Arsenal"]
-print("Opponent:",opponent)
+    # Add time of the match.
+    games[i].append(time[:-1])
 
+    # Add stadium to the array.
+    games[i].append(location[i].split(">")[1])
 
-badges = re.findall(r'class="team-crest__crest" src="[\S]*.\/>', str(div))
+    # Get base64 of the opponent badge.
+    games[i].append(base64.b64encode(requests.get(img_url+[badges[i*2],badges[i*2+1]][t1=="Arsenal"].split('"')[-2]).content))
 
-arsenal_badge = [badges[0],badges[1]][t2=="Arsenal"].split('"')[-2]
-print("Arsenal badge url: ",img_url+arsenal_badge)
-
-opponent_badge = [badges[0],badges[1]][t1=="Arsenal"].split('"')[-2]
-print("Opponent badge url: ",img_url+opponent_badge)
-
-arsenal_base64 = base64.b64encode(requests.get(img_url+arsenal_badge).content)
-opponent_base64 = base64.b64encode(requests.get(img_url+opponent_badge).content)
-
-########################################
-# Get next games that are to be played #
-########################################
-
-div = soup.find_all('div', class_='accordions')
-
-opponent = re.findall(r'<div class="team-crest__name-value">[(\d\w )]*', str(div))
-
-location = re.findall(r'<div class="event-info__venue">[\w.\-\' ]*', str(div))
-for i in location:
-    loc = i.split(">")[1]
-    print("Stadium:",loc)
-
-#competition = re.findall(r'<div class="event-info__extra">[(\d\w )]*', str(div))
-#competition = competition[0].split(">")[1]
-#print("Competition:",competition)
+    
+# todo: Update the X games to the database.
 
 
 
+
+# Testing print.
+print(games)
