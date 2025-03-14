@@ -1,7 +1,7 @@
 <resources>
-    <string name="app_name">Arsenal_App</string>
+    <string name="app_name">Arsenal</string>
 
-    <string name="title">Arsenal</string>
+    <string name="title">Arsenal Information</string>
 
     //Nav Bar
     <string name="home_nav">Home</string>

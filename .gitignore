@@ -31,4 +31,9 @@ google-services.json
 
 # Android Profiling
 *.hprof
+
+# Database
 /app/src/main/java/com/example/arsenal_app/database/DBInfo.java
+dbHelper.py
+key.json
+__pycache__

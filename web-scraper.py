@@ -4,6 +4,7 @@ import requests
 from bs4 import BeautifulSoup as bs
 import base64
 from firebase_admin import credentials,db,initialize_app
+import dbHelper 
 
 # Define URL to be scraped
 url = "https://www.arsenal.com/fixtures"
@@ -62,10 +63,30 @@ for i in range(games_amount):
     games[i].append(base64.b64encode(requests.get(img_url+[badges[i*2],badges[i*2+1]][t1=="Arsenal"].split('"')[-2]).content))
 
     
-# todo: Update the X games to the database.
+
+# Fetch the service account key JSON file contents
+cred = credentials.Certificate('key.json')
+
+# Initialize the app with a service account, granting admin privileges
+initialize_app(cred, {'databaseURL': dbHelper.url})
+
+# Get ID and update.
+ref = db.reference('id_counter')
+data = ref.get()
+ref.set(22)
 
 
 
+# Get the database reference.
+ref = db.reference()
 
-# Testing print.
-print(games)
+# Titles.
+titles = "competition, opponent, date, time, stadium, opponent badge".split(", ")
+
+# List to JSON.
+json = {}
+for i in range(games_amount):
+    json[i] = {titles[j]:games[i][j] for j in range(len(titles)-1)}
+
+# Update the X games to the newest information.
+ref.update({"games":json})

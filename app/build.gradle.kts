@@ -38,7 +38,11 @@ android {
 
 dependencies {
     // Import the BoM for the Firebase platform
-    implementation(platform("com.google.firebase:firebase-bom:33.1.2"))
+    //implementation(platform("com.google.firebase:firebase-bom:33.1.2"))
+
+    implementation(platform("com.google.firebase:firebase-bom:32.2.3"))
+
+
 
     // Add the dependency for the Realtime Database library
     implementation("com.google.firebase:firebase-database")

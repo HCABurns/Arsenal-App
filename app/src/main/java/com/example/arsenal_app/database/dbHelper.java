@@ -1,5 +1,6 @@
 package com.example.arsenal_app.database;
 
+import com.google.firebase.FirebaseApp;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -18,13 +19,14 @@ public class dbHelper {
     private int id_counter = 0;
 
     public dbHelper(){
-
+        System.out.println(DBInfo.key);
         firebaseDatabase = FirebaseDatabase.getInstance(DBInfo.key);
         games_database = firebaseDatabase.getReference(DBInfo.db_name);
-        id_database = firebaseDatabase.getReference(DBInfo.db_name2).child("id");
+        id_database = firebaseDatabase.getReference(DBInfo.db_name2);
         id_database.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                System.out.println(id_counter);
                 id_counter = dataSnapshot.getValue(Integer.class);
                 System.out.println(id_counter);
             }
@@ -34,15 +36,8 @@ public class dbHelper {
                 // ...
             }
         });
+        id_database.setValue(10000);
+        System.out.println("Sorted");
 
     }
-
-
-    public static void main(String[] args) {
-
-        dbHelper dbHelper = new dbHelper();
-        dbHelper.id_database.setValue(0);
-
-    }
-
 }

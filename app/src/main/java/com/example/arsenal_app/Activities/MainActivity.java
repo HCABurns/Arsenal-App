@@ -9,6 +9,7 @@ import com.example.arsenal_app.database.dbHelper;
 import com.example.arsenal_app.fragments.HomeFragment;
 import com.example.arsenal_app.fragments.RecentFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.FirebaseApp;
 
 
 /**
@@ -25,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        FirebaseApp.initializeApp(this); // Crucial: Initialize Firebase FIRST
         dbHelper db = new dbHelper();
 
         // Create fragments that can be used for filling the fragment container.
