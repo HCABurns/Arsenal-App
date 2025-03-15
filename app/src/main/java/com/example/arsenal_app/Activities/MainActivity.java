@@ -19,7 +19,7 @@ import com.google.firebase.FirebaseApp;
  */
 public class MainActivity extends AppCompatActivity {
 
-    private static dbHelper db;
+    public static dbHelper db = new dbHelper();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,7 +27,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         FirebaseApp.initializeApp(this); // Crucial: Initialize Firebase FIRST
-        dbHelper db = new dbHelper();
 
         // Create fragments that can be used for filling the fragment container.
         HomeFragment homeFragment = new HomeFragment();
@@ -41,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
         //for aesthetics.
         BottomNavigationView bottomNavigationView = findViewById(R.id.navigation);
         bottomNavigationView.setSelectedItemId(R.id.invisible);
+        //bottomNavigationView.setSelectedItemId(R.id.home_nav_bar);
 
         //Create an onclick to replace the frame with the correct required frame.
         bottomNavigationView.setOnItemSelectedListener(item -> {
