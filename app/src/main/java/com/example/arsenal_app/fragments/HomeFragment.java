@@ -1,5 +1,7 @@
 package com.example.arsenal_app.fragments;
 
+import static com.example.arsenal_app.Activities.MainActivity.db;
+
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,8 +9,15 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.arsenal_app.Adapters.HomeAdapter;
 import com.example.arsenal_app.R;
+import com.example.arsenal_app.database.dbHelper;
+import com.example.arsenal_app.models.Game;
+
+import java.util.ArrayList;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -16,6 +25,9 @@ import com.example.arsenal_app.R;
  * create an instance of this fragment.
  */
 public class HomeFragment extends Fragment {
+
+    private ArrayList<Game> games = db.games;
+    private RecyclerView recyclerView;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -63,8 +75,17 @@ public class HomeFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
+        System.out.println("OPENING THE Home PAGE -----------------------------");
+
         TextView text = view.findViewById(R.id.next_match_competition);
-        text.setText("Yes");
+        System.out.println("WDaDWa");
+
+        db.setGames();
+
+        if (games.size() > 0) {
+            text.setText(games.get(0).getOpponent());
+            System.out.println(games.get(0).toString());
+        }
 
         return view;
     }

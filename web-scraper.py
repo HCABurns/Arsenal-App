@@ -60,7 +60,7 @@ for i in range(games_amount):
     games[i].append(location[i].split(">")[1])
 
     # Get base64 of the opponent badge.
-    games[i].append(base64.b64encode(requests.get(img_url+[badges[i*2],badges[i*2+1]][t1=="Arsenal"].split('"')[-2]).content))
+    games[i].append(str(base64.b64encode(requests.get(img_url+[badges[i*2],badges[i*2+1]][t1=="Arsenal"].split('"')[-2]).content))[2:-2])
 
     
 
@@ -81,12 +81,12 @@ ref.set(22)
 ref = db.reference()
 
 # Titles.
-titles = "competition, opponent, date, time, stadium, opponent badge".split(", ")
+titles = "competition, opponent, date, time, stadium, badge_base64".split(", ")
 
 # List to JSON.
 json = {}
 for i in range(games_amount):
-    json[i] = {titles[j]:games[i][j] for j in range(len(titles)-1)}
+    json[i] = {titles[j]:games[i][j] for j in range(len(titles))}
 
 # Update the X games to the newest information.
 ref.update({"games":json})
