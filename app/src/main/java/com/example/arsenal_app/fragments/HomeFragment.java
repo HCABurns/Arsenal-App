@@ -66,11 +66,15 @@ public class HomeFragment extends Fragment {
      * This is a function that will load the data from the database to the page.
      * 1. Call fetchData - This will access the database and return with a callback.
      * 2. Callback is received and executed: onDataLoaded if returned data otherwise onError.
-     *
-     * DataStatus is an implementation of an interface.
+     * Following is for personal learning:
+     * DataStatus is an Anonymous class implementation of an interface.
+     * db.fetchData only has access to the interface (onDataLoaded and onError)
+     * It can't access the public string as it only accesses the interface - The public string is
+     * is a local scope variable. A getter or callback would be used to access.
      */
     private void load(){
         db.fetchData(new DataStatus() {
+            public String fetchCantAccessMe="";
             @Override
             public void onDataLoaded(ArrayList<Game> dataList) {
                 // Set the loading bar to invisible.
@@ -100,6 +104,7 @@ public class HomeFragment extends Fragment {
             public void onError(String errorMessage) {
                 // Set the top line of text to the error message.
                 competitionView.setText(errorMessage);
+                this.fetchCantAccessMe=""; //Added to remove warning
             }
         });
     }

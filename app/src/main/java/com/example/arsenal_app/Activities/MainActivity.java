@@ -15,7 +15,6 @@ import com.google.firebase.FirebaseApp;
 
 /**
  * Class for storing the main page.
- *
  * An activity is for the entire page. Fragments are UI for dynamic data.
  */
 public class MainActivity extends AppCompatActivity {
