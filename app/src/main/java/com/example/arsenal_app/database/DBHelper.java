@@ -3,7 +3,6 @@ package com.example.arsenal_app.database;
 import androidx.annotation.NonNull;
 
 import com.example.arsenal_app.models.Game;
-import com.google.firebase.FirebaseApp;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -12,44 +11,19 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
-public class dbHelper {
+public class DBHelper {
 
-    private String key = DBInfo.key;
-
+    // Required variables for the database and storage.
     public ArrayList<Game> games = new ArrayList<>();
 
     private FirebaseDatabase firebaseDatabase;
 
     private DatabaseReference games_database;
 
-    private DatabaseReference id_database;
-    private int id_counter = 0;
-
-    public dbHelper(){
-
+    public DBHelper(){
         // Define the references to the database.
-        firebaseDatabase = FirebaseDatabase.getInstance(key);
+        firebaseDatabase = FirebaseDatabase.getInstance(DBInfo.key);
         games_database = firebaseDatabase.getReference(DBInfo.db_name);
-        id_database = firebaseDatabase.getReference(DBInfo.db_name2);
-        id_database.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                System.out.println(id_counter);
-                id_counter = dataSnapshot.getValue(Integer.class);
-                System.out.println(id_counter);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                // ...
-            }
-        });
-
-
-        //setGames();
-        System.out.println("Finished");
-        System.out.println(games.size());
-
     }
 
 
@@ -74,12 +48,7 @@ public class dbHelper {
                     Game game = ds.getValue(Game.class);
                     games.add(game);
                 }
-                // todo: remove this
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
+
                 // Callback using the data that has been read in.
                 dataStatus.onDataLoaded(games);
             }
@@ -90,6 +59,7 @@ public class dbHelper {
              */
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
+                // Callback with the error message.
                 dataStatus.onError(databaseError.getMessage());
             }
         });
@@ -106,10 +76,8 @@ public class dbHelper {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 games.clear();
                 for (DataSnapshot ds : dataSnapshot.getChildren()){
-                    System.out.println(ds);
                     Game game = ds.getValue(Game.class);
                     games.add(game);
-                    System.out.println("Game added: " + games.size());
                 }
 
             }

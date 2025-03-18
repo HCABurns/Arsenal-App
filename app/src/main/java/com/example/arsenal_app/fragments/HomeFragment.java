@@ -22,13 +22,13 @@ import java.util.ArrayList;
 import android.util.Base64;
 
 /**
- * A simple {@link Fragment} subclass.
- * Use the {@link HomeFragment#newInstance} factory method to
- * create an instance of this fragment.
+ * A simple {@link Fragment} subclass. The subclass implements the required routines and will
+ * include the information for the next game for arsenal.
  */
 public class HomeFragment extends Fragment {
 
-    private ArrayList<Game> games = db.games;
+    // Define the required variables for this fragment.
+    //private ArrayList<Game> games = db.games;
     private TextView competitionView;
     private TextView opponentView;
     private TextView dateView;
@@ -37,33 +37,8 @@ public class HomeFragment extends Fragment {
     private ImageView opponentBadgeView;
     private ProgressBar progressBar;
 
-
-
-
     public HomeFragment() {
         // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment HomeFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static HomeFragment newInstance(String param1, String param2) {
-        HomeFragment fragment = new HomeFragment();
-        Bundle args = new Bundle();
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
     }
 
     @Override
@@ -80,8 +55,6 @@ public class HomeFragment extends Fragment {
         timeView = view.findViewById(R.id.next_match_time);
         stadiumView = view.findViewById(R.id.next_match_stadium);
         opponentBadgeView = view.findViewById(R.id.next_opponent_opponentBadge);
-
-        // Todo: Retrieve and convert the base64 to an image to be displayed.
 
         // Load the data into the page.
         load();
@@ -104,7 +77,7 @@ public class HomeFragment extends Fragment {
                 progressBar.setVisibility(View.INVISIBLE);
 
                 // Get next match.
-                Game game = games.get(2);
+                Game game = dataList.get(0);
 
                 // Update all the views with the information.
                 competitionView.setText(game.getCompetition());
@@ -113,17 +86,20 @@ public class HomeFragment extends Fragment {
                 dateView.setText(game.getDate());
                 timeView.setText(game.getTime());
 
-                System.out.println(game.getBadge_base64());
+                // Convert the base 64 to a bitmap image and set.
                 byte[] base64 = Base64.decode(game.getBadge_base64(), Base64.DEFAULT);
                 Bitmap bitmap = BitmapFactory.decodeByteArray(base64, 0, base64.length);
                 opponentBadgeView.setImageBitmap(bitmap);
             }
 
+            /**
+             * Callback function to display the error message to the user.
+             * @param errorMessage - Error message to be displayed to the user.
+             */
             @Override
             public void onError(String errorMessage) {
-
+                // Set the top line of text to the error message.
                 competitionView.setText(errorMessage);
-
             }
         });
     }
