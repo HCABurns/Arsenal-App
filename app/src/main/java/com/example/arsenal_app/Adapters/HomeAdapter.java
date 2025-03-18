@@ -7,6 +7,7 @@ import static com.example.arsenal_app.Activities.MainActivity.db;
 import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -32,29 +33,29 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
+        TextView competition;
         public ViewHolder(View view) {
             super(view);
 
-            TextView competition = view.findViewById(R.id.next_match_competition);
-            competition.setText(games.get(0).getCompetition());
-
+            competition = view.findViewById(R.id.next_match_competition);
         }
-
-        /**
-         * Initialize the dataset of the Adapter
-         *
-         * by RecyclerView.
-         */
     }
 
     @NonNull
     @Override
     public HomeAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return null;
+
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_home, parent, false);
+        return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull HomeAdapter.ViewHolder holder, int position) {
+
+        // Bind the data to the UI
+
+        holder.competition.setText(games.get(0).getCompetition());
+
 
     }
 
