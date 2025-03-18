@@ -30,8 +30,10 @@ games = [[] for i in range(games_amount)]
 
 # Get the information from the web page.
 data = str(soup.find_all('div', class_='accordions'))
+print(data)
 opponent = re.findall(r'<div class="team-crest__name-value">[(\d\w )]*', data)
-times = re.findall(r'<time datetime="[\d\S]*"', data)
+#times = re.findall(r'<time datetime="[\d\S]*"', data)<time datetime="[\d\S ]+<?
+times = re.findall(r'<time datetime="[\d\S ]+<?', data)
 location = re.findall(r'<div class="event-info__venue">[\w.\-\' ]*', data)
 badges = re.findall(r'class="team-crest__crest" src="[\S]*.\/>', data)
 competition = re.findall(r'<div class="event-info__extra">[(\d\w )]*', data)
@@ -50,11 +52,13 @@ for i in range(games_amount):
     games[i].append(opp + [" (H)", " (A)"][home])
 
     # Add date of the match.
-    date, time = times[i].split('"')[1].split("T")
+    date, time = times[i*2].split('"')[1].split("T")
     games[i].append(date)
 
     # Add time of the match.
-    games[i].append(time[:-1])
+    time = times[i*2].split("-")[-1].split("<")[0].strip()+":00"
+    games[i].append(time)
+    #games[i].append(time[:-1])
 
     # Add stadium to the array.
     games[i].append(location[i].split(">")[1])
@@ -69,12 +73,6 @@ cred = credentials.Certificate('key.json')
 
 # Initialize the app with a service account, granting admin privileges
 initialize_app(cred, {'databaseURL': dbHelper.url})
-
-# Get ID and update.
-ref = db.reference('id_counter')
-data = ref.get()
-ref.set(22)
-
 
 
 # Get the database reference.

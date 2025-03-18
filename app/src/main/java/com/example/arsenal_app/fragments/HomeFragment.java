@@ -5,6 +5,7 @@ import static com.example.arsenal_app.Activities.MainActivity.db;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,7 +19,11 @@ import com.example.arsenal_app.R;
 import com.example.arsenal_app.database.DataStatus;
 import com.example.arsenal_app.models.Game;
 
+import java.text.MessageFormat;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+
 import android.util.Base64;
 
 /**
@@ -34,6 +39,7 @@ public class HomeFragment extends Fragment {
     private TextView dateView;
     private TextView timeView;
     private TextView stadiumView;
+    private TextView countdownView;
     private ImageView opponentBadgeView;
     private ProgressBar progressBar;
 
@@ -54,6 +60,7 @@ public class HomeFragment extends Fragment {
         dateView = view.findViewById(R.id.next_match_date);
         timeView = view.findViewById(R.id.next_match_time);
         stadiumView = view.findViewById(R.id.next_match_stadium);
+        countdownView = view.findViewById(R.id.next_match_countdown);
         opponentBadgeView = view.findViewById(R.id.next_opponent_opponentBadge);
 
         // Load the data into the page.
@@ -94,6 +101,66 @@ public class HomeFragment extends Fragment {
                 byte[] base64 = Base64.decode(game.getBadge_base64(), Base64.DEFAULT);
                 Bitmap bitmap = BitmapFactory.decodeByteArray(base64, 0, base64.length);
                 opponentBadgeView.setImageBitmap(bitmap);
+
+                // Find the milliseconds between next game and now.
+                LocalDateTime pastDateTime;
+                LocalDateTime now;
+
+                String[] dateParts = game.getDate().split("-");
+                int year = Integer.parseInt(dateParts[0]);
+                int month = Integer.parseInt(dateParts[1]);
+                int day = Integer.parseInt(dateParts[2]);
+                // todo: Decide on if leaving in 24h format or change to 12h with am/pm
+
+                String[] timeParts = game.getTime().split(":");
+                int hours = Integer.parseInt(timeParts[0]);
+                int minutes = Integer.parseInt(timeParts[1]);
+                int seconds = Integer.parseInt(timeParts[2]);
+
+                long milliseconds = -1;
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                    pastDateTime = LocalDateTime.of(year,month,day,hours,minutes,seconds);
+                    now = LocalDateTime.now();
+                    milliseconds = Duration.between(now,pastDateTime).getSeconds()*1000;
+
+                }
+
+                // Set the countdown and decrement every second.
+                new CountDownTimer(milliseconds, 1000){
+                    @Override
+                    public void onTick(long milliRemaining) {
+                        // Find the remaining days, hours, minutes and seconds.
+                        int days = (int) (milliRemaining / (1000 * 60 * 60 * 24));
+                        milliRemaining -= days * (1000 * 60 * 60 * 24);
+                        int hours = (int) (milliRemaining / (1000 * 60 * 60));
+                        milliRemaining -= hours * (1000 * 60 * 60);
+                        int minutes = (int) (milliRemaining / (1000 * 60));
+                        milliRemaining -= minutes * (1000 * 60);
+                        int seconds = (int) (milliRemaining / (1000));
+
+                        // Display the correct format based on available information.
+                        if (days > 0) {
+                            countdownView.setText(MessageFormat.format("{0}D {1}H {2}M {3}S",
+                                    days, hours, minutes, seconds));
+                        } else if (hours > 0){
+                            countdownView.setText(MessageFormat.format("{0}H {1}M {2}S",
+                                    hours, minutes, seconds));
+                        } else if (minutes > 0) {
+                            countdownView.setText(MessageFormat.format("{0}M {1}S",
+                                    minutes, seconds));
+                        } else{
+                            countdownView.setText(MessageFormat.format("{0}S", seconds));
+                        }
+                    }
+
+                    /**
+                     * Once the countdown reaches 0, display a game started message.
+                     */
+                    @Override
+                    public void onFinish() {
+                        countdownView.setText(R.string.countdown_finished);
+                    }
+                }.start();
             }
 
             /**
