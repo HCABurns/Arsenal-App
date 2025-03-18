@@ -2,10 +2,13 @@ package com.example.arsenal_app.fragments;
 
 import static com.example.arsenal_app.Activities.MainActivity.db;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -16,6 +19,7 @@ import com.example.arsenal_app.database.DataStatus;
 import com.example.arsenal_app.models.Game;
 
 import java.util.ArrayList;
+import android.util.Base64;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -30,6 +34,7 @@ public class HomeFragment extends Fragment {
     private TextView dateView;
     private TextView timeView;
     private TextView stadiumView;
+    private ImageView opponentBadgeView;
     private ProgressBar progressBar;
 
 
@@ -74,6 +79,9 @@ public class HomeFragment extends Fragment {
         dateView = view.findViewById(R.id.next_match_date);
         timeView = view.findViewById(R.id.next_match_time);
         stadiumView = view.findViewById(R.id.next_match_stadium);
+        opponentBadgeView = view.findViewById(R.id.next_opponent_opponentBadge);
+
+        // Todo: Retrieve and convert the base64 to an image to be displayed.
 
         // Load the data into the page.
         load();
@@ -96,7 +104,7 @@ public class HomeFragment extends Fragment {
                 progressBar.setVisibility(View.INVISIBLE);
 
                 // Get next match.
-                Game game = games.get(0);
+                Game game = games.get(2);
 
                 // Update all the views with the information.
                 competitionView.setText(game.getCompetition());
@@ -105,8 +113,10 @@ public class HomeFragment extends Fragment {
                 dateView.setText(game.getDate());
                 timeView.setText(game.getTime());
 
-
-
+                System.out.println(game.getBadge_base64());
+                byte[] base64 = Base64.decode(game.getBadge_base64(), Base64.DEFAULT);
+                Bitmap bitmap = BitmapFactory.decodeByteArray(base64, 0, base64.length);
+                opponentBadgeView.setImageBitmap(bitmap);
             }
 
             @Override
