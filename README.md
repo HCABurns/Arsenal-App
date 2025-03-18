@@ -1,13 +1,16 @@
 # Arsenal-App
 
+This is an Android application that will provide basic information about Arsenal's upcoming fixtures. This is a personal project to create an application that will allow me to further my knowledge in Java.
 
-This is an Android application that will provide basic information about Arsenal's upcoming fixtures. 
 
-## To-Do
+## To Do:
 
-* Design the database: Information to include, type of data etc.
-* Implement the access to the database to the app.
-* Web scraper / API to retrieve information (Likely a python script - Either run daily using scheduler or host and connect with app)
+* Clean the code as it currently is: Ensure all comments are understandable and relevant, all functions have a javadoc, any todos are marked with clear information.
+* Redesign the homepage to: Include a countdown, be the proper format, wrap for different screens.
+* Screen 2 - Include smaller items that include all the next few games and their information.
+* Decide how the web-scraper will interact with the app. (Host and call with API or schedule and run daily.)
+* Expand on the readme - Async with Firebase.
+
 
 
 ## Future Plans

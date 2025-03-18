@@ -2,22 +2,24 @@ package com.example.arsenal_app.fragments;
 
 import static com.example.arsenal_app.Activities.MainActivity.db;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.arsenal_app.Adapters.HomeAdapter;
 import com.example.arsenal_app.R;
-import com.example.arsenal_app.database.dbHelper;
+import com.example.arsenal_app.database.DataStatus;
 import com.example.arsenal_app.models.Game;
 
 import java.util.ArrayList;
+import android.util.Base64;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -27,16 +29,16 @@ import java.util.ArrayList;
 public class HomeFragment extends Fragment {
 
     private ArrayList<Game> games = db.games;
-    private RecyclerView recyclerView;
+    private TextView competitionView;
+    private TextView opponentView;
+    private TextView dateView;
+    private TextView timeView;
+    private TextView stadiumView;
+    private ImageView opponentBadgeView;
+    private ProgressBar progressBar;
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+
 
     public HomeFragment() {
         // Required empty public constructor
@@ -54,8 +56,6 @@ public class HomeFragment extends Fragment {
     public static HomeFragment newInstance(String param1, String param2) {
         HomeFragment fragment = new HomeFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
     }
@@ -63,10 +63,7 @@ public class HomeFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+
     }
 
     @Override
@@ -75,18 +72,59 @@ public class HomeFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
-        System.out.println("OPENING THE Home PAGE -----------------------------");
+        // Find the views and store.
+        progressBar = view.findViewById(R.id.progressBar);
+        competitionView = view.findViewById(R.id.next_match_competition);
+        opponentView = view.findViewById(R.id.next_match_opponent);
+        dateView = view.findViewById(R.id.next_match_date);
+        timeView = view.findViewById(R.id.next_match_time);
+        stadiumView = view.findViewById(R.id.next_match_stadium);
+        opponentBadgeView = view.findViewById(R.id.next_opponent_opponentBadge);
 
-        TextView text = view.findViewById(R.id.next_match_competition);
-        System.out.println("WDaDWa");
+        // Todo: Retrieve and convert the base64 to an image to be displayed.
 
-        db.setGames();
-
-        if (games.size() > 0) {
-            text.setText(games.get(0).getOpponent());
-            System.out.println(games.get(0).toString());
-        }
+        // Load the data into the page.
+        load();
 
         return view;
+    }
+
+    /**
+     * This is a function that will load the data from the database to the page.
+     * 1. Call fetchData - This will access the database and return with a callback.
+     * 2. Callback is received and executed: onDataLoaded if returned data otherwise onError.
+     *
+     * DataStatus is an implementation of an interface.
+     */
+    private void load(){
+        db.fetchData(new DataStatus() {
+            @Override
+            public void onDataLoaded(ArrayList<Game> dataList) {
+                // Set the loading bar to invisible.
+                progressBar.setVisibility(View.INVISIBLE);
+
+                // Get next match.
+                Game game = games.get(2);
+
+                // Update all the views with the information.
+                competitionView.setText(game.getCompetition());
+                opponentView.setText(game.getOpponent());
+                stadiumView.setText(game.getStadium());
+                dateView.setText(game.getDate());
+                timeView.setText(game.getTime());
+
+                System.out.println(game.getBadge_base64());
+                byte[] base64 = Base64.decode(game.getBadge_base64(), Base64.DEFAULT);
+                Bitmap bitmap = BitmapFactory.decodeByteArray(base64, 0, base64.length);
+                opponentBadgeView.setImageBitmap(bitmap);
+            }
+
+            @Override
+            public void onError(String errorMessage) {
+
+                competitionView.setText(errorMessage);
+
+            }
+        });
     }
 }
