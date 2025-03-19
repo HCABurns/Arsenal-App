@@ -82,6 +82,13 @@
                 android:layout_weight="1"
                 android:textAlignment="center" />
 
+            <TextView
+                android:id="@+id/next_match_countdown"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textAlignment="center" />
+
             <ImageView
                 android:id="@+id/next_opponent_opponentBadge"
                 android:layout_width="400px"
