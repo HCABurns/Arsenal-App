@@ -10,12 +10,13 @@
 
     <TextView
         android:id="@+id/addTextTest"
-        android:layout_width="412dp"
-        android:layout_height="68dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
         android:background="#000000"
         android:clickable="false"
         android:fontFamily="sans-serif-medium"
         android:gravity="center"
+        android:padding="8sp"
         android:text="@string/title"
         android:textAlignment="center"
         android:textColor="@color/white"
