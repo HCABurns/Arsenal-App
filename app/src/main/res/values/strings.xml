@@ -3,15 +3,19 @@
 
     <string name="title">Arsenal Information</string>
 
-    //Nav Bar
+    <!-- Nav Bar -->
     <string name="home_nav">Home</string>
-    <string name="next_nav">Recent</string>
+    <string name="next_nav">Future</string>
 
-    // Home Screen
+    <!-- Home Screen -->
     <string name="logo_desc">Logo Image</string>
+    <string name="countdown_finished">Game Started!</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
 
-    <string name="countdown_finished">Game Started!</string>
+    <!-- Future Games Screen -->
+
+
+
 </resources>

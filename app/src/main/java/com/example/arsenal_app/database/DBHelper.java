@@ -79,7 +79,6 @@ public class DBHelper {
                     Game game = ds.getValue(Game.class);
                     games.add(game);
                 }
-
             }
 
             @Override
