@@ -39,7 +39,7 @@ public class FutureAdapter extends RecyclerView.Adapter<FutureAdapter.ViewHolder
         private ImageView badge;
         public ViewHolder(View view) {
             super(view);
-
+            // Find the relevant text views in the .
             competition = view.findViewById(R.id.future_games_competition);
             opponent = view.findViewById(R.id.future_games_opponent);
             stadium = view.findViewById(R.id.future_games_stadium);
@@ -52,21 +52,16 @@ public class FutureAdapter extends RecyclerView.Adapter<FutureAdapter.ViewHolder
     @NonNull
     @Override
     public FutureAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-
+        // Get view for the single item.
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.single_game, parent, false);
+
+        // Return the view holder.
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull FutureAdapter.ViewHolder holder, int position) {
-
-        System.out.println("Populate: " + games.size());
-
         // Bind the data to the UI
-
-        System.out.println(position);
-        System.out.println(games.get(position));
-
         holder.competition.setText(games.get(position).getCompetition());
         holder.opponent.setText(games.get(position).getOpponent());
         holder.stadium.setText(games.get(position).getStadium());
@@ -77,10 +72,6 @@ public class FutureAdapter extends RecyclerView.Adapter<FutureAdapter.ViewHolder
         byte[] base64 = Base64.decode(games.get(position).getBadge_base64(), Base64.DEFAULT);
         Bitmap bitmap = BitmapFactory.decodeByteArray(base64, 0, base64.length);
         holder.badge.setImageBitmap(bitmap);
-
-        System.out.println("WDA");
-        System.out.println(getItemCount());
-        System.out.println(holder.competition.getText());
     }
 
     @Override
