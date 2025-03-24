@@ -8,7 +8,7 @@ import android.os.Bundle;
 import com.example.arsenal_app.R;
 import com.example.arsenal_app.database.DBHelper;
 import com.example.arsenal_app.fragments.HomeFragment;
-import com.example.arsenal_app.fragments.RecentFragment;
+import com.example.arsenal_app.fragments.FutureFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.FirebaseApp;
 
@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Create fragments that can be used for filling the fragment container.
         HomeFragment homeFragment = new HomeFragment();
-        RecentFragment recentFragment = new RecentFragment();
+        FutureFragment futureFragment = new FutureFragment();
 
         // Create an item to get the bottom navigation. Set the active item to an invisible item
         // for aesthetics.
@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
         // loading but instead will just store, hide and show each page.
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.add(R.id.fragment_container, homeFragment);
-        transaction.add(R.id.fragment_container, recentFragment).hide(recentFragment).commit();
+        transaction.add(R.id.fragment_container, futureFragment).hide(futureFragment).commit();
         previousFragment = homeFragment;
 
         //Create an onclick to replace the frame with the correct required frame.
@@ -61,8 +61,8 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
             else if (item.getItemId() == R.id.recent_nav_bar) {
-                t.hide(previousFragment).show(recentFragment).commit();
-                previousFragment = recentFragment;
+                t.hide(previousFragment).show(futureFragment).commit();
+                previousFragment = futureFragment;
                 return true;
             }
             else {
