@@ -37,3 +37,5 @@ google-services.json
 dbHelper.py
 key.json
 __pycache__
+f1-scraper.py
+test.py

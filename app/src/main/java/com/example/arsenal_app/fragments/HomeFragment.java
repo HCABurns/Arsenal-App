@@ -87,42 +87,52 @@ public class HomeFragment extends Fragment {
                 // Set the loading bar to invisible.
                 progressBar.setVisibility(View.INVISIBLE);
 
-                // Get next match.
-                Game game = dataList.get(0);
-
-                // Update all the views with the information.
-                competitionView.setText(game.getCompetition());
-                opponentView.setText(game.getOpponent());
-                stadiumView.setText(game.getStadium());
-                dateView.setText(game.getDate());
-                timeView.setText(game.getTime());
-
-                // Convert the base 64 to a bitmap image and set.
-                byte[] base64 = Base64.decode(game.getBadge_base64(), Base64.DEFAULT);
-                Bitmap bitmap = BitmapFactory.decodeByteArray(base64, 0, base64.length);
-                opponentBadgeView.setImageBitmap(bitmap);
-
-                // Find the milliseconds between next game and now.
-                LocalDateTime pastDateTime;
-                LocalDateTime now;
-
-                String[] dateParts = game.getDate().split("-");
-                int year = Integer.parseInt(dateParts[0]);
-                int month = Integer.parseInt(dateParts[1]);
-                int day = Integer.parseInt(dateParts[2]);
-                // todo: Decide on if leaving in 24h format or change to 12h with am/pm
-
-                String[] timeParts = game.getTime().split(":");
-                int hours = Integer.parseInt(timeParts[0]);
-                int minutes = Integer.parseInt(timeParts[1]);
-                int seconds = Integer.parseInt(timeParts[2]);
-
+                int i = 0;
                 long milliseconds = -1;
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                    pastDateTime = LocalDateTime.of(year,month,day,hours,minutes,seconds);
-                    now = LocalDateTime.now();
-                    milliseconds = Duration.between(now,pastDateTime).getSeconds()*1000;
 
+                while (true) {
+                    // Get next match.
+                    Game game = dataList.get(i);
+
+                    // Update all the views with the information.
+                    competitionView.setText(game.getCompetition());
+                    opponentView.setText(game.getOpponent());
+                    stadiumView.setText(game.getStadium());
+                    dateView.setText(game.getDate());
+                    timeView.setText(game.getTime());
+
+                    // Convert the base 64 to a bitmap image and set.
+                    byte[] base64 = Base64.decode(game.getBadge_base64(), Base64.DEFAULT);
+                    Bitmap bitmap = BitmapFactory.decodeByteArray(base64, 0, base64.length);
+                    opponentBadgeView.setImageBitmap(bitmap);
+
+                    // Find the milliseconds between next game and now.
+                    LocalDateTime pastDateTime;
+                    LocalDateTime now;
+
+                    String[] dateParts = game.getDate().split("-");
+                    int year = Integer.parseInt(dateParts[0]);
+                    int month = Integer.parseInt(dateParts[1]);
+                    int day = Integer.parseInt(dateParts[2]);
+                    // todo: Decide on if leaving in 24h format or change to 12h with am/pm
+
+                    String[] timeParts = game.getTime().split(":");
+                    int hours = Integer.parseInt(timeParts[0]);
+                    int minutes = Integer.parseInt(timeParts[1]);
+                    int seconds = Integer.parseInt(timeParts[2]);
+
+                    milliseconds = -1;
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                        pastDateTime = LocalDateTime.of(year, month, day, hours, minutes, seconds);
+                        now = LocalDateTime.now();
+                        milliseconds = Duration.between(now, pastDateTime).getSeconds() * 1000;
+                    }
+
+                    System.out.println(milliseconds);
+                    if (milliseconds > -7200000){
+                        break;
+                    }
+                    i+=1;
                 }
 
                 // Set the countdown and decrement every second.
