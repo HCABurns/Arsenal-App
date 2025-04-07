@@ -27,7 +27,7 @@ while True:
         ##########################################
 
         # Competition, Opponent Name, Date, Time, Stadium, opponent badge base64
-        games_amount = 4
+        games_amount = 6
         games = [[] for i in range(games_amount)]
 
         # Get the information from the web page.
@@ -66,7 +66,7 @@ while True:
             games[i].append(location[i].split(">")[1])
 
             # Get base64 of the opponent badge.
-            games[i].append(str(base64.b64encode(requests.get(img_url+[badges[i*2],badges[i*2+1]][t1=="Arsenal"].split('"')[-2]).content))[2:-2])
+            games[i].append(str(base64.b64encode(requests.get(img_url+[badges[i*2],badges[i*2+1]][t1=="Arsenal"].split('"')[-2]).content))[2:-5])
 
         # Exit and update the database.
         break
