@@ -65,8 +65,8 @@ public class FutureAdapter extends RecyclerView.Adapter<FutureAdapter.ViewHolder
         holder.competition.setText(games.get(position).getCompetition());
         holder.opponent.setText(games.get(position).getOpponent());
         holder.stadium.setText(games.get(position).getStadium());
-        holder.date.setText(games.get(position).getDate());
-        holder.time.setText(games.get(position).getTime());
+        holder.date.setText(games.get(position).getDateFormatted());
+        holder.time.setText(games.get(position).getTimeFormatted());
 
         // Convert the base 64 to a bitmap image and set.
         byte[] base64 = Base64.decode(games.get(position).getBadge_base64(), Base64.DEFAULT);

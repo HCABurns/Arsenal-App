@@ -13,15 +13,34 @@ public class Game {
 
     public Game(String opponent, String date, String time, String competition, String stadium, String badge_base64) {
         this.opponent = opponent;
-        this.date = date;
-        this.time = time;
         this.competition = competition;
         this.stadium = stadium;
         this.badge_base64 = badge_base64;
+        this.date = date;
+        this.time = time;
     }
 
     public Game(){
 
+    }
+
+    public String getDateFormatted(){
+        // Convert the date and time to a better method.
+        String[] dateParts = date.split("-");
+        int year = Integer.parseInt(dateParts[0]);
+        int month = Integer.parseInt(dateParts[1]);
+        int day = Integer.parseInt(dateParts[2]);
+        return String.format("%d/%d/%d",day,month,year);
+    }
+
+    public String getTimeFormatted(){
+        String[] timeParts = time.split(":");
+        int hours = Integer.parseInt(timeParts[0]);
+        int minutes = Integer.parseInt(timeParts[1]);
+        int seconds = Integer.parseInt(timeParts[2]);
+        String meridiem;
+        if (hours < 12){meridiem = "AM";}else{meridiem="PM";};
+        return String.format("%d:%02d%s",hours,minutes,meridiem);
     }
 
     public String getId() {
