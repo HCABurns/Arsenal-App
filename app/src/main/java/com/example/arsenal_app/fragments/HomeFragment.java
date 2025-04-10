@@ -94,12 +94,12 @@ public class HomeFragment extends Fragment {
                     // Get next match.
                     Game game = dataList.get(i);
 
-                    // Update all the views with the information.
+                    // Update all the views with the information. (Note: Date is done separate)
                     competitionView.setText(game.getCompetition());
                     opponentView.setText(game.getOpponent());
                     stadiumView.setText(game.getStadium());
-                    dateView.setText(game.getDate());
-                    timeView.setText(game.getTime());
+                    dateView.setText(game.getDateFormatted());
+                    timeView.setText(game.getTimeFormatted());
 
                     // Convert the base 64 to a bitmap image and set.
                     byte[] base64 = Base64.decode(game.getBadge_base64(), Base64.DEFAULT);
