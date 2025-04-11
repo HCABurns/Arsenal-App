@@ -21,8 +21,9 @@ while True:
         elem = WebDriverWait(driver, 30).until(EC.presence_of_element_located((By.ID, "onetrust-accept-btn-handler")))
 
         # Locate the element and get its text
-        elems = driver.find_elements(By.CLASS_NAME, "css-n446gb")  
+        elems = driver.find_elements(By.CLASS_NAME, "css-n446gb")
 
+    
         # Find the relevant information and store.
         games = []
         for game in elems:
@@ -36,11 +37,12 @@ while True:
 
         # Extract the image URLs
         image_urls = []
-        for img in images[2:6]:
-            src = img.get_attribute("data-image") or img.get_attribute("src")
+        images = driver.find_elements(By.CSS_SELECTOR, "div.css-n446gb img")
+        for game in images:
+            src = game.get_attribute("data-image") or game.get_attribute("src")
             if src:
                 image_urls.append(src)
-        for i,url in enumerate(image_urls):
+        for i,url in enumerate(image_urls[:len(games)]):
             games[i].append(url)
 
         # Currently print the games together.
