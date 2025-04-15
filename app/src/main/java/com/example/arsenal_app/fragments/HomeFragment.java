@@ -80,7 +80,7 @@ public class HomeFragment extends Fragment {
      * is a local scope variable. A getter or callback would be used to access.
      */
     private void load(){
-        db.fetchData(new DataStatus() {
+        db.fetchData(new DataStatus<Game>() {
             public String fetchCantAccessMe="";
             @Override
             public void onDataLoaded(ArrayList<Game> dataList) {

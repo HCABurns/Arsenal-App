@@ -7,6 +7,7 @@ import androidx.fragment.app.FragmentTransaction;
 import android.os.Bundle;
 import com.example.arsenal_app.R;
 import com.example.arsenal_app.database.DBHelper;
+import com.example.arsenal_app.fragments.EpicFragment;
 import com.example.arsenal_app.fragments.HomeFragment;
 import com.example.arsenal_app.fragments.FutureFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -38,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
         // Create fragments that can be used for filling the fragment container.
         HomeFragment homeFragment = new HomeFragment();
         FutureFragment futureFragment = new FutureFragment();
+        EpicFragment epicFragment = new EpicFragment();
 
         // Create an item to get the bottom navigation. Set the active item to an invisible item
         // for aesthetics.
@@ -49,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
         // loading but instead will just store, hide and show each page.
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.add(R.id.fragment_container, homeFragment);
+        transaction.add(R.id.fragment_container, epicFragment).hide(epicFragment);
         transaction.add(R.id.fragment_container, futureFragment).hide(futureFragment).commit();
         previousFragment = homeFragment;
 
@@ -63,6 +66,11 @@ public class MainActivity extends AppCompatActivity {
             else if (item.getItemId() == R.id.recent_nav_bar) {
                 t.hide(previousFragment).show(futureFragment).commit();
                 previousFragment = futureFragment;
+                return true;
+            }
+            else if (item.getItemId() == R.id.epic_game_nav_bar){
+                t.hide(previousFragment).show(epicFragment).commit();
+                previousFragment = epicFragment;
                 return true;
             }
             else {
