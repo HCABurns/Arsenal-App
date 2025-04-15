@@ -10,14 +10,14 @@ import java.util.ArrayList;
  *                the fragment will then do whatever is required to the data to display it.
  * onError - This is called by the dbHelper if the data has not been read in - For whatever reason.
  */
-public interface DataStatus {
+public interface DataStatus<T> {
 
     /**
      * Function that would be run when data has been returned.
      *
      * @param dataList - ArrayList containing Game objects.
      */
-    void onDataLoaded(ArrayList<Game> dataList);
+    void onDataLoaded(ArrayList<T> dataList);
 
     /**
      * Function that would run if there is an error connecting to the database or storing the data.

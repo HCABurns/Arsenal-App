@@ -1,7 +1,10 @@
 package com.example.arsenal_app.database;
 
+import android.provider.ContactsContract;
+
 import androidx.annotation.NonNull;
 
+import com.example.arsenal_app.models.EpicGame;
 import com.example.arsenal_app.models.Game;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -15,15 +18,18 @@ public class DBHelper {
 
     // Required variables for the database and storage.
     public ArrayList<Game> games = new ArrayList<>();
+    public ArrayList<EpicGame> epicGames = new ArrayList<>();
 
     private FirebaseDatabase firebaseDatabase;
 
-    private DatabaseReference games_database;
+    private DatabaseReference footballGamesDatabase;
+    private DatabaseReference epicGamesDatabase;
 
     public DBHelper(){
         // Define the references to the database.
         firebaseDatabase = FirebaseDatabase.getInstance(DBInfo.key);
-        games_database = firebaseDatabase.getReference(DBInfo.db_name);
+        footballGamesDatabase = firebaseDatabase.getReference(DBInfo.dbName);
+        epicGamesDatabase = firebaseDatabase.getReference(DBInfo.dbName2);
     }
 
 
@@ -35,9 +41,9 @@ public class DBHelper {
      * @param dataStatus Implementation of the DataStatus interface that will deal with data
      *                   when it has been read in or in the event of an error occuring.
      */
-    public void fetchData(DataStatus dataStatus) {
+    public void fetchData(DataStatus<Game> dataStatus) {
         // Retrieve the data from the database.
-        games_database.addValueEventListener(new ValueEventListener() {
+        footballGamesDatabase.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 // Empty array list.
@@ -66,12 +72,44 @@ public class DBHelper {
 
     }
 
+    public void fetchEpicData(DataStatus<EpicGame> dataStatus) {
+        // Retrieve the data from the database.
+        epicGamesDatabase.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                // Empty array list.
+                epicGames.clear();
+
+                // Populate the array list with games retrieved from the database.
+                for (DataSnapshot ds : dataSnapshot.getChildren()){
+                    EpicGame game = ds.getValue(EpicGame.class);
+                    epicGames.add(game);
+                    System.out.println(game.toString());
+                }
+
+                // Callback using the data that has been read in.
+                dataStatus.onDataLoaded(epicGames);
+            }
+
+            /**
+             * Callback with an error message if an error occurs.
+             * @param databaseError A description of the error that occurred.
+             */
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // Callback with the error message.
+                dataStatus.onError(databaseError.getMessage());
+            }
+        });
+
+    }
+
 
     /**
      * Function to asynchronously retrieve all the data from the database.
      */
     public void setGames() {
-        games_database.addValueEventListener(new ValueEventListener() {
+        footballGamesDatabase.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 games.clear();
@@ -86,7 +124,5 @@ public class DBHelper {
                 System.out.println("The read failed: " + databaseError.getCode());
             }
         });
-
-
     }
 }
