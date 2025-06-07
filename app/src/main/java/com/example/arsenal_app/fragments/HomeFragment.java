@@ -140,14 +140,13 @@ public class HomeFragment extends Fragment {
                     @Override
                     public void onTick(long milliRemaining) {
                         // Find the remaining days, hours, minutes and seconds.
-                        int days = (int) (milliRemaining / (1000 * 60 * 60 * 24));
-                        milliRemaining -= days * (1000 * 60 * 60 * 24);
-                        int hours = (int) (milliRemaining / (1000 * 60 * 60));
-                        milliRemaining -= hours * (1000 * 60 * 60);
-                        int minutes = (int) (milliRemaining / (1000 * 60));
-                        milliRemaining -= minutes * (1000 * 60);
-                        int seconds = (int) (milliRemaining / (1000));
-
+                        int days = (int) (milliRemaining / (1000.0 * 60.0 * 60.0 * 24.0));
+                        milliRemaining -= days * (1000.0 * 60.0 * 60.0 * 24.0);
+                        int hours = (int) (milliRemaining / (1000.0 * 60.0 * 60.0));
+                        milliRemaining -= hours * (1000.0 * 60.0 * 60.0);
+                        int minutes = (int) (milliRemaining / (1000.0 * 60.0));
+                        milliRemaining -= minutes * (1000.0 * 60.0);
+                        int seconds = (int) (milliRemaining / (1000.0));
                         // Display the correct format based on available information.
                         if (days > 0) {
                             countdownView.setText(MessageFormat.format("{0}D {1}H {2}M {3}S",

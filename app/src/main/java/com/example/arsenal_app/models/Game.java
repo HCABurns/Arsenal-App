@@ -38,7 +38,7 @@ public class Game {
         int hours = Integer.parseInt(timeParts[0]);
         int minutes = Integer.parseInt(timeParts[1]);
         String meridiem;
-        if (hours < 12){meridiem = "AM";}else{meridiem="PM";};
+        if (hours < 12){meridiem = "AM";}else{meridiem="PM";}
         return String.format("%d:%02d%s",hours,minutes,meridiem);
     }
 

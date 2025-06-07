@@ -1,7 +1,5 @@
 package com.example.arsenal_app.database;
 
-import com.example.arsenal_app.models.Game;
-
 import java.util.ArrayList;
 
 /**

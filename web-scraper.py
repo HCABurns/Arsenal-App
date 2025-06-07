@@ -40,9 +40,10 @@ while True:
         badges = re.findall(r'class="team-crest__crest" src="[\S]*.\/>', data)
         competition = re.findall(r'<div class="event-info__extra">[(\d\w )]*', data)
 
+        games_amount = len(competition)
+        games = [[] for i in range(games_amount)]
         # Extract the information for each game and store.
         for i in range(games_amount):
-
             # Add competition
             games[i].append(competition[i].split(">")[1])
 
@@ -76,7 +77,7 @@ while True:
 while True:
     try:
         # Fetch the service account key JSON file contents
-        cred = credentials.Certificate('key.json')
+        cred = credentials.Certificate(dbHelper.file_location)
 
         # Initialize the app with a service account, granting admin privileges
         initialize_app(cred, {'databaseURL': dbHelper.url})

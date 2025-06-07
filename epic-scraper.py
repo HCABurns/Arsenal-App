@@ -19,22 +19,32 @@ url = "https://store.epicgames.com/en-US/free-games"
 # Scrape the page for the relevant information.
 while True:
     try:
+        print("Start")
         # Load the webpage amd wait until the element is present.
         driver = webdriver.Chrome()
         driver.maximize_window()
         driver.get(url)
         driver.implicitly_wait(50)
-        elem = WebDriverWait(driver, 30).until(EC.presence_of_element_located((By.ID, "onetrust-accept-btn-handler")))
+        #elem = WebDriverWait(driver, 30).until(EC.presence_of_element_located((By.ID, "onetrust-accept-btn-handler")))
 
+        print("Find elements")
         # Locate the element and get its text
         elems = driver.find_elements(By.CLASS_NAME, "css-n446gb")
+        #elems = driver.find_elements(By.CLASS_NAME, "css-aere9z")
+        
 
-    
+        print("General Info")
         # Find the relevant information and store.
         games = []
         for game in elems:
-            games += [game.text.split("\n")]
+            gg = game.text.split("\n")
+            if len(gg) == 2:
+                gg = [" "] + gg
+            games += [gg]
 
+        print(games)
+        
+        print("Images")
         # Find all image tags
         elems = driver.find_element(By.ID, "app-main-content")
         images = elems.find_elements(By.TAG_NAME, "img")
@@ -47,6 +57,7 @@ while True:
             if src:
                 image_urls.append(src)
 
+        print("Image conversion")
         for i, url in enumerate(image_urls[:len(games)]):
             print(url)
 
@@ -86,7 +97,7 @@ while True:
 while True:
     try:
         # Fetch the service account key JSON file contents
-        cred = credentials.Certificate('key.json')
+        cred = credentials.Certificate(dbHelper.file_location)
 
         # Initialize the app with a service account, granting admin privileges
         initialize_app(cred, {'databaseURL': dbHelper.url})
