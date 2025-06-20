@@ -38,35 +38,7 @@ app.secret_key = dbHelper.get_secret_key()
 ### Will be usage information.
 @app.route('/')
 def landing_page():
-    #Upload the images to the database.
-    """
-    for i in range(len(doggos)):
-        with open(f"static/{doggos[i]['img']}", "rb") as imageFile:
-            b64 = base64.b64encode(imageFile.read())
-        #im.save(image_bytes, format='JPEG')
-            
-        client.dogs.dog.insert_one({"img":b64,"name":doggos[i]["name"],"breed":doggos[i]["breed"],"fact":doggos[i]["fact"]})
-
-    for x in client.dogs.dog.find():
-        image64 = x["img"].decode()
-        #print(image64)
-    """
-    """
-    #Get random record
-    pipeline = [{'$sample': {'size': 1}}]
-
-    #db.dogs.dog.aggregate([{ $sample: { size: 1 } }])
-    for res in client.dogs.dog.aggregate(pipeline):
-        dog_image = res["img"].decode()
-        dog_name = res["name"]
-        dog_breed = res["breed"]
-        dog_Fact = res["fact"]
-    """
-    return render_template("index.html")#,doggo_name = dog_name,
-     #                                   dog_image = dog_image,
-     #                                   doggo_breed = dog_breed,
-     #                                   doggo_fact = dog_Fact)
-
+    return render_template("index.html")
 
 # Get api to get ALL the race/ quali information.
 @app.route('/api', methods = ['GET'])
@@ -98,4 +70,7 @@ def page_not_found(e):
     # note that we set the 404 status explicitly
     return jsonify({'error': 'Unknown Request'}), 404
     #return render_template('error.html'), 404
+
+def handler(request, response):
+    return app(request.environ, response.start_response)
 
