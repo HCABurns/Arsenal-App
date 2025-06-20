@@ -10,6 +10,7 @@ This is an Android application that will provide information about a variety of 
 
 ## Planned Implementation:
 
+* Redesign the epic game menu to be a single game with a swipe to view another game. (Similar design to the arsenal countdown page)
 * New Page: F1 Page to display the next F1 circuit, qualifying and sprint/race times.
 * Potential for an upcoming F1 race page.
 * Weather Information - Specificially the wind information.
