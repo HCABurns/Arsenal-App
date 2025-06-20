@@ -1,14 +1,15 @@
 {
-	"builds":[
-	{
-		"src":"f1_api.py",
-		"use":"@vercel/python"
-	}
-	],
-	"routes" : [
-	{
-		"src":"/(.*)",
-		"dest":"/f1_api.py"
-	}
-	]
+  "builds": [
+    {
+      "src": "f1_api.py",
+      "use": "@vercel/python",
+      "config": { "maxLambdaSize": "50mb" }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "f1_api.py"
+    }
+  ]
 }
