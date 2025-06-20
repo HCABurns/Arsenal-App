@@ -26,6 +26,11 @@ def initialize_firebase():
         print(f"Error occurred during Firebase initialization: {e}")
         return {}
 
+races = initialize_firebase()
+app = Flask(__name__)
+app.config['MAX_CONTENT_PATH'] = 16 * 1000000  # 16MB limit
+app.secret_key = os.environ["SECRET_KEY"]
+
 @app.route('/')
 def landing_page():
     return render_template("index.html")
@@ -50,8 +55,4 @@ def page_not_found(e):
     return jsonify({'error': 'Unknown Request'}), 404
 
 if __name__ == "__main__":
-    races = initialize_firebase()
-    app = Flask(__name__)
-    app.config['MAX_CONTENT_PATH'] = 16 * 1000000  # 16MB limit
-    app.secret_key = os.environ["SECRET_KEY"]
     app.run()
