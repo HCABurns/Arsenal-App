@@ -7,28 +7,21 @@ import dbHelper
 
 # Extra imports.
 import base64
+import os
+import json
 
 # Database connector
-while True:
+def initialize_firebase():
     try:
-        # Fetch the service account key JSON file contents
-        cred = credentials.Certificate(dbHelper.file_location)
-
-        # Initialize the app with a service account, granting admin privileges
-        initialize_app(cred, {'databaseURL': dbHelper.url})
-
-        # Get the database reference.
-        ref = db.reference("f1")
-
-        races = ref.get()
-        
-        #print(*races,sep="\n")
-        print("Successfully Retrieved!")
-        break
-        
+        FIREBASE_JSON_PATH = "/etc/secrets/firebase.json"
+        with open(FIREBASE_JSON_PATH) as f:
+            firebase_config = json.load(f)
+        cred = credentials.Certificate(firebase_config)
+        initialize_app(cred, {'databaseURL': os.environ["DB_URL"]})
+        app.secret_key = os.environ["SECRET_KEY"]
+        return ref.get()
     except Exception as e:
-        print(f"Error occured: {e}")
-        break
+        return {}
 
 
 app = Flask(__name__)
@@ -75,4 +68,5 @@ def handler(request, response):
     return app(request.environ, response.start_response)
 
 if __name__ == "__main__":
+    races = initialize_firebase()
     app.run()
