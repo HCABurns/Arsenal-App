@@ -16,6 +16,7 @@ from PIL import Image
 # Define the URL to be searched.
 url = "https://store.epicgames.com/en-US/free-games"
 
+valid = True
 # Scrape the page for the relevant information.
 while True:
     try:
@@ -28,12 +29,9 @@ while True:
         #elem = WebDriverWait(driver, 30).until(EC.presence_of_element_located((By.ID, "onetrust-accept-btn-handler")))
 
         print("Find elements")
-        # Locate the element and get its text
-        elems = driver.find_elements(By.CLASS_NAME, "css-n446gb")
-        #elems = driver.find_elements(By.CLASS_NAME, "css-aere9z")
+        elems = driver.find_elements(By.CLASS_NAME, "css-1myhtyb")
         
-
-        print("General Info")
+        print("General Info" , len(elems))
         # Find the relevant information and store.
         games = []
         for game in elems:
@@ -42,23 +40,29 @@ while True:
                 gg = [" "] + gg
             games += [gg]
 
+        chunks = []
+        for i in range(0, len(games[0]), 3):
+            chunks.append(games[0][i:i + 3])
+        games = chunks
         print(games)
         
         print("Images")
         # Find all image tags
         elems = driver.find_element(By.ID, "app-main-content")
-        images = elems.find_elements(By.TAG_NAME, "img")
+        #images = elems.find_elements(By.TAG_NAME, "img")
 
         # Extract the image URLs
         image_urls = []
-        images = driver.find_elements(By.CSS_SELECTOR, "div.css-n446gb img")
+        #images = driver.find_elements(By.CSS_SELECTOR, "div.css-n446gb img")
+        images = driver.find_elements(By.CSS_SELECTOR, "div.css-1myhtyb img")
         for game in images:
             src = game.get_attribute("data-image") or game.get_attribute("src")
             if src:
                 image_urls.append(src)
+        print(image_urls)
 
         print("Image conversion")
-        for i, url in enumerate(image_urls[:len(games)]):
+        for i, url in enumerate(image_urls):
             print(url)
 
             # Download image
@@ -83,7 +87,7 @@ while True:
         # todo: Update the database with the information.
         # todo: Convert the URL to base64 with requests.
         for line in games:
-            print(line)
+            print(line[0:-1])
             print()
             
         print("\nSuccessful Retrieval!")
@@ -91,10 +95,10 @@ while True:
 
     except Exception as e:
         print(f"Error occured: {e}")
+        valid = False
         break
 
-
-while True:
+while valid:
     try:
         # Fetch the service account key JSON file contents
         cred = credentials.Certificate(dbHelper.file_location)
@@ -111,6 +115,7 @@ while True:
         # List to JSON.
         json = {}
         for i in range(len(games)):
+            print(games[i][1], len(games[i]))
             json[i] = {titles[j]:games[i][j] for j in range(len(titles))}
 
         # Update the X games to the newest information.
