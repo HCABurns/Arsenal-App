@@ -13,7 +13,7 @@
     <ImageView
         android:id="@+id/epic_game_cover"
         android:layout_width="0dp"
-        android:layout_height="455dp"
+        android:layout_height="wrap_content"
         android:layout_marginTop="15dp"
         android:layout_weight="1"
         android:src="@drawable/common_full_open_on_phone"

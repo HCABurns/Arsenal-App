@@ -15,7 +15,6 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.arsenal_app.R;
-import com.example.arsenal_app.fragments.FutureFragment;
 import com.example.arsenal_app.models.Game;
 
 import java.util.ArrayList;
@@ -53,7 +52,7 @@ public class FutureAdapter extends RecyclerView.Adapter<FutureAdapter.ViewHolder
     @Override
     public FutureAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         // Get view for the single item.
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.single_game, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.single_football_game, parent, false);
 
         // Return the view holder.
         return new ViewHolder(view);
