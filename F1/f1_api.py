@@ -41,6 +41,9 @@ def get_races():
 
 @app.route('/api/country/<string:country_name>', methods=['GET'])
 def get_race(country_name):
+    if not isinstance(races, dict):
+        return jsonify({'error': 'Data unavailable'}), 503
+    
     results = []
     for key in races.keys():
         race_info = races[key]
