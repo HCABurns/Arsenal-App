@@ -39,3 +39,5 @@ key.json
 __pycache__
 f1-scraper.py
 test.py
+F1/render.yaml
+F1/firebase.json
