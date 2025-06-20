@@ -74,3 +74,5 @@ def page_not_found(e):
 def handler(request, response):
     return app(request.environ, response.start_response)
 
+if __name__ == "__main__":
+    app.run()
