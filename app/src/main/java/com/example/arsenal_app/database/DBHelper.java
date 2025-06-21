@@ -1,11 +1,10 @@
 package com.example.arsenal_app.database;
 
-import android.provider.ContactsContract;
-
 import androidx.annotation.NonNull;
 
 import com.example.arsenal_app.models.EpicGame;
 import com.example.arsenal_app.models.Game;
+import com.example.arsenal_app.models.Race;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -19,6 +18,7 @@ public class DBHelper {
     // Required variables for the database and storage.
     public ArrayList<Game> games = new ArrayList<>();
     public ArrayList<EpicGame> epicGames = new ArrayList<>();
+    public ArrayList<Race> races = new ArrayList<>();
 
     private FirebaseDatabase firebaseDatabase;
 

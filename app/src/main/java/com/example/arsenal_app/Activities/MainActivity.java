@@ -10,6 +10,7 @@ import com.example.arsenal_app.database.DBHelper;
 import com.example.arsenal_app.fragments.EpicFragment;
 import com.example.arsenal_app.fragments.HomeFragment;
 import com.example.arsenal_app.fragments.FutureFragment;
+import com.example.arsenal_app.fragments.NextRaceFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.FirebaseApp;
 
@@ -40,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
         HomeFragment homeFragment = new HomeFragment();
         FutureFragment futureFragment = new FutureFragment();
         EpicFragment epicFragment = new EpicFragment();
+        NextRaceFragment nextRaceFragment = new NextRaceFragment();
 
         // Create an item to get the bottom navigation. Set the active item to an invisible item
         // for aesthetics.
@@ -52,7 +54,8 @@ public class MainActivity extends AppCompatActivity {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.add(R.id.fragment_container, homeFragment);
         transaction.add(R.id.fragment_container, epicFragment).hide(epicFragment);
-        transaction.add(R.id.fragment_container, futureFragment).hide(futureFragment).commit();
+        transaction.add(R.id.fragment_container, futureFragment).hide(futureFragment);
+        transaction.add(R.id.fragment_container, nextRaceFragment).hide(nextRaceFragment).commit();
         previousFragment = homeFragment;
 
         //Create an onclick to replace the frame with the correct required frame.
@@ -63,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
                 previousFragment = homeFragment;
                 return true;
             }
-            else if (item.getItemId() == R.id.recent_nav_bar) {
+            else if (item.getItemId() == R.id.next_nav_bar) {
                 t.hide(previousFragment).show(futureFragment).commit();
                 previousFragment = futureFragment;
                 return true;
@@ -71,6 +74,12 @@ public class MainActivity extends AppCompatActivity {
             else if (item.getItemId() == R.id.epic_game_nav_bar){
                 t.hide(previousFragment).show(epicFragment).commit();
                 previousFragment = epicFragment;
+                return true;
+            }
+            else if (item.getItemId() == R.id.next_race_nav_bar){
+                System.out.println("Next_nav_bar");
+                t.hide(previousFragment).show(nextRaceFragment).commit();
+                previousFragment = nextRaceFragment;
                 return true;
             }
             else {
