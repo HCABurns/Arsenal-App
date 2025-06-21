@@ -21,7 +21,13 @@ def initialize_firebase():
         })
         ref = db.reference("f1")
         print("Firebase initialized. Successfully retrieved data.")
-        return ref.get()
+        races = ref.get()
+        races_with_ids = []
+        for id, race in enumerate(races):
+            race_with_id = race
+            race_with_id["id"] = id
+            races_with_ids.append(race_with_id)
+        return races_with_ids
     except Exception as e:
         print(f"Error occurred during Firebase initialization: {e}")
         return {}
@@ -31,15 +37,24 @@ app = Flask(__name__)
 app.config['MAX_CONTENT_PATH'] = 16 * 1000000  # 16MB limit
 app.secret_key = os.environ["SECRET_KEY"]
 
+
 @app.route('/')
 def landing_page():
+    # Alter to be a usage for the api.
     return render_template("index.html")
+
 
 @app.route('/api', methods=['GET'])
 def get_races():
-    return races
+    races_with_ids = []
+    for id, race in enumerate(races):
+        race_with_id = race
+        race_with_id["id"] = id
+        races_with_ids.append(race_with_id)
+    return {"races":races_with_ids,"count":len(races)}, 200
 
-@app.route('/api/country/<string:country_name>', methods=['GET'])
+
+@app.route('/api/<string:country_name>', methods=['GET'])
 def get_race(country_name):
     results = []
     for race_info in races:
@@ -47,11 +62,15 @@ def get_race(country_name):
             results.append(race_info)
     if not results:
         return jsonify({'error': 'No races found for this country'}), 404
-    return jsonify(results)
+    return {"races":results,"count":len(results)}, 200
+
 
 @app.errorhandler(404)
 def page_not_found(e):
-    return jsonify({'error': 'Unknown Request'}), 404
+    if request.path.startswith('/api'):
+        return jsonify({'error': 'Unknown Request'}), 404
+    return jsonify({'error but different': 'Unknown Request'}), 404
+
 
 if __name__ == "__main__":
     app.run()
