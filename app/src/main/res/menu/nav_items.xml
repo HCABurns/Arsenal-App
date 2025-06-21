@@ -7,7 +7,7 @@
         android:icon="@android:drawable/ic_dialog_alert"
         android:title="@string/home_nav" />
     <item
-        android:id="@+id/recent_nav_bar"
+        android:id="@+id/next_nav_bar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:icon="@android:drawable/ic_menu_view"
@@ -18,7 +18,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:icon="@drawable/epic"
-        android:title="Free Game" />
+        android:title="@string/epic_nav" />
+    <item
+        android:id="@+id/next_race_nav_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:icon="@android:drawable/ic_dialog_info"
+        android:title="@string/next_race_nav" />
     <item
         android:id="@+id/invisible"
         android:visible="false" />

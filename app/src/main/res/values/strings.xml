@@ -6,6 +6,8 @@
     <!-- Nav Bar -->
     <string name="home_nav">Home</string>
     <string name="next_nav">Future</string>
+    <string name="next_race_nav">Race</string>
+    <string name="epic_nav">Free Game</string>
 
     <!-- Home Screen -->
     <string name="logo_desc">Logo Image</string>
