@@ -7,17 +7,17 @@ This is an Android application that will provide information about a variety of 
 * Countdown to Arsenal F.C's next fixture with extra information.
 * Recycler view of Arsenal F.C's next few fixtures with extra information.
 * Information regarding the upcoming free games on epicgames.com
+* F1 Page to display the next F1 circuit, qualifying and sprint/race times. (22/6/25)
 
 ## Planned Implementation:
 
-* Redesign the epic game menu to be a single game with a swipe to view another game. (Similar design to the arsenal countdown page)
-* New Page: F1 Page to display the next F1 circuit, qualifying and sprint/race times.
-* Potential for an upcoming F1 race page.
+* Redesign the epic game menu to be a single game with a swipe to view another game.
+* Potential for an upcoming F1 race page (Potential alter: Convert the F1 Page to include swiping for the next event).
 * Weather Information - Specificially the wind information.
 * Aggregation of the top stories from multiple news sources.
 
-## To Do:
+## To Do Future:
 
 * Clickable Future Matches - Include clickable items that include extra information regarding a game: recent results etc.
 * Potentially change the navigation page from the bottom to a hamburger menu.
-* Expand on the readme/docs - Async with Firebase.
+* Expand on the readme/docs.
