@@ -1,5 +1,8 @@
 package com.example.arsenal_app.models;
 
+/**
+ * Race object used to store all the information regarding an F1 qualifying, sprint or race event.
+ */
 public class Race {
 
     private int id;
@@ -67,8 +70,12 @@ public class Race {
         return time;
     }
 
+    /**
+     * Convert from 24h in the format xx:xx to xx:xx(AM/PM)
+     * @return String in the 12h format.
+     */
     public String getFormattedTime() {
-
+        // Convert from 24h to 12h.
         String[] timeParts = time.split(":");
         int hours = Integer.parseInt(timeParts[0]);
         int minutes = Integer.parseInt(timeParts[1]);

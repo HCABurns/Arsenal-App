@@ -20,65 +20,87 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonArray;
 
+/**
+ * This class deals with any calls to the API. It's purpose is to connect to the API, retrieve the
+ * data and sent it to whichever function asked for it to then be processed.
+ */
 public class API {
 
-    public ArrayList<Race> actual() throws Exception {
+    public ArrayList<Race> all_races_api() throws Exception {
 
+        // URL to the api to return all the data.
         URL url = new URL("https://general-personal-app.onrender.com/api");
 
+        // Set connect time to be long due to Render cold-start if the API hasn't been called for
+        // a period of time.
         OkHttpClient client = new OkHttpClient.Builder()
                 .connectTimeout(60, TimeUnit.SECONDS)
                 .readTimeout(90, TimeUnit.SECONDS)
                 .writeTimeout(60, TimeUnit.SECONDS)
                 .build();
 
+        // TODO: Convert the retries to be in the Fragment code, allow for display of {tried 1/ 3}...
+        // Allow for 3 tries to connect to the API.
         int maxRetries = 1;
         for (int attempt = 1; attempt <= maxRetries; attempt++) {
             try {
+                // Create a request object.
                 Request request = new Request.Builder().url(url).build();
 
+                // Call the API and wait for a response.
                 try (Response response = client.newCall(request).execute()) {
-                    System.out.println("Status: " + response.code());
-
+                    // Convert the return code to JSON.
                     String body = response.body().string();
-                    System.out.println("Response: " + body);
-
                     Gson gson = new Gson();
                     JsonObject json = gson.fromJson(body, JsonObject.class);
 
+                    // Get the information from the JSON.
                     int count = json.get("count").getAsInt();
-                    System.out.println("Race Amount: " + count);
-
                     JsonArray racesArray = json.getAsJsonArray("races");
-                    ArrayList<Race> raceList = new ArrayList<>();
 
-                    for (int i = 0; i < racesArray.size(); i++) {
+                    // Convert the information to Race objects and store in ArrayList and the db.
+                    ArrayList<Race> raceList = new ArrayList<>();
+                    for (int i = 0; i < count; i++) {
                         Race race = gson.fromJson(racesArray.get(i), Race.class);
                         raceList.add(race);
                     }
                     db.races = raceList;
                     maxRetries = -1;
-                    // Callback using the data that has been read in.
+
                 }
             } catch (Exception e) {
+                // In the event it fails, wait and try again until maxRetires. Otherwise raise exception.
                 System.out.println("Attempt " + attempt + " failed: " + e.getMessage());
                 if (attempt == maxRetries) throw e;
                 Thread.sleep(2000);
             }
         }
+        // Return the races.
         return db.races;
     }
 
-    public void get_all_races(DataStatus<Race> dataStatus) throws Exception {
+    /**
+     * Function to get all race information via API.
+     * @param dataStatus Object used for callback.
+     */
+    public void get_all_races(DataStatus<Race> dataStatus) {
+        // Start a new background thread to perform the network operation.
         new Thread(() -> {
             try {
-                ArrayList<Race> races = actual(); // your OkHttp code
+                // Perform the network API call to retrieve the list of races.
+                ArrayList<Race> races = all_races_api();
+
+                // Create a Handler tied to the main (UI) thread.
+                // This allows of posting a task that updates UI components or triggers callbacks safely.
                 Handler handler = new Handler(Looper.getMainLooper());
+
+                // Post the success callback to run on the main thread.
                 handler.post(() -> {
                     dataStatus.onDataLoaded(races);
                 });
 
             } catch (Exception e) {
+                // If an error occurs, also post the error callback to the main thread.
                 new Handler(Looper.getMainLooper()).post(() -> {
                     dataStatus.onError(e.getMessage());
                 });
@@ -89,8 +111,15 @@ public class API {
 
 
     public static void main(String[] args) throws Exception {
+        /*
+        Testing to ensure the API functionality works correctly.
+         */
 
+        // Create API object.
         API api = new API();
+
+        // Call the function to get the information. DataStatus is used for callback once the data
+        // has been loaded or failed to load.
         api.get_all_races(new DataStatus<Race>() {
             @Override
             public void onDataLoaded(ArrayList<Race> arrayList) {
@@ -102,11 +131,5 @@ public class API {
                 System.out.println("Error on retrieval of the races!");
             }
         });
-
-        for(Race race : db.races){
-            System.out.println(race);
         }
-
-        }
-
 }
