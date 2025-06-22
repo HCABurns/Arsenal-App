@@ -2,18 +2,22 @@ package com.example.arsenal_app.models;
 
 public class Race {
 
-    public int id;
-    public String country;
-    public String date;
-    public String race;
-    public String time;
+    private int id;
+    private String country;
+    private String date;
+    private String race;
+    private String time;
+    private String track;
+    private String circuit;
 
-    public Race(int id, String country, String date, String race, String time) {
+    public Race(int id, String country, String date, String race, String time, String track, String circuit) {
         this.id = id;
         this.country = country;
         this.date = date;
         this.race = race;
         this.time = time;
+        this.track = track;
+        this.circuit = circuit;
     }
 
     @Override
@@ -25,5 +29,72 @@ public class Race {
                 ", name='" + race + '\'' +
                 ", time='" + time + '\'' +
                 '}';
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+
+    public String getRace() {
+        return race;
+    }
+
+    public void setRace(String race) {
+        this.race = race;
+    }
+
+    public String getTime() {
+        return time;
+    }
+
+    public String getFormattedTime() {
+
+        String[] timeParts = time.split(":");
+        int hours = Integer.parseInt(timeParts[0]);
+        int minutes = Integer.parseInt(timeParts[1]);
+        if (hours < 12){
+            return String.format("%02d:%02dAM", hours, minutes);
+        }
+        return String.format("%d:%02dPM", hours-12, minutes);
+    }
+
+    public void setTime(String time) {
+        this.time = time;
+    }
+
+    public String getTrack() {
+        return track;
+    }
+
+    public void setTrack(String track) {
+        this.track = track;
+    }
+
+    public String getCircuit() {
+        return circuit;
+    }
+
+    public void setCircuit(String circuit) {
+        this.circuit = circuit;
     }
 }
