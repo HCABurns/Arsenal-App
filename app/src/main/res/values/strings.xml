@@ -12,6 +12,12 @@
     <!-- Home Screen -->
     <string name="logo_desc">Logo Image</string>
     <string name="countdown_finished">Game Started!</string>
+
+    <!-- Next Race Screen -->
+    <string name="race_countdown_finished">Race Started!</string>
+    <string name="race_countdown_season_finished">Season Finished!</string>
+    <string name="race_blank"> </string>
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
