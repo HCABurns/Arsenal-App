@@ -2,6 +2,8 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:background="@color/white"
+    android:textColor="@color/black"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -18,19 +20,70 @@
         <LinearLayout
             android:id="@+id/race_layout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical"
             android:visibility="gone"
+            android:layout_gravity="center"
             tools:visibility="invisible">
 
-            <!-- Your race views go here -->
-            <TextView
-                android:id="@+id/race_name"
+
+            <!-- Race views -->
+            <ImageView
+                android:id="@+id/track_map_holder"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
-            <!-- add more as needed -->
+            <TextView
+                android:id="@+id/race_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/hello_blank_fragment"
+                android:textAlignment="center"
+                android:textColor="@color/black"
+                android:textSize="38sp"
+                android:textStyle="bold"
+                app:layout_constraintHorizontal_bias="0.5" />
 
+            <TextView
+                android:id="@+id/next_race_countdown"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/race_countdown_finished"
+                android:textAlignment="center"
+                android:textColor="#000000"
+                android:textSize="32sp"
+                android:textStyle="bold"
+                app:layout_constraintHorizontal_bias="0.5" />
+
+            <TextView
+                android:id="@+id/next_race_circuit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/race_blank"
+                android:textAlignment="center"
+                android:textSize="22sp"
+                android:textColor="#000000"
+                app:layout_constraintHorizontal_bias="0.5" />
+
+            <TextView
+                android:id="@+id/next_race_date"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/race_blank"
+                android:textAlignment="center"
+                android:textSize="22sp"
+                android:textColor="#000000"
+                app:layout_constraintHorizontal_bias="0.5" />
+
+            <TextView
+                android:id="@+id/next_race_time"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/race_blank"
+                android:textAlignment="center"
+                android:textSize="22sp"
+                android:textColor="#000000"
+                app:layout_constraintHorizontal_bias="0.5" />
         </LinearLayout>
 
     </FrameLayout>

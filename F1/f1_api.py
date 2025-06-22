@@ -7,6 +7,7 @@ from firebase_admin import credentials, db, initialize_app
 # Extra imports
 import os
 import json
+import base64
 
 def initialize_firebase():
     try:
