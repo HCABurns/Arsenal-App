@@ -24,6 +24,7 @@ public class DBHelper {
 
     private DatabaseReference footballGamesDatabase;
     private DatabaseReference epicGamesDatabase;
+    private String usid;
 
     public DBHelper(){
         // Define the references to the database.
@@ -125,4 +126,13 @@ public class DBHelper {
             }
         });
     }
+
+    public void set_usid(String idToken){
+        this.usid = idToken;
+    }
+
+    public String get_usid(){
+        return this.usid;
+    }
+
 }

@@ -17,6 +17,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.arsenal_app.R;
 import com.example.arsenal_app.database.API;
+import com.example.arsenal_app.database.Callback;
 import com.example.arsenal_app.database.DataStatus;
 import com.example.arsenal_app.models.Race;
 
@@ -46,9 +47,9 @@ public class NextRaceFragment extends Fragment {
         // Load the data into the page via API call.
         API api = new API();
         try {
-            api.get_all_races(new DataStatus<Race>() {
+            api.allRacesApiAsync(new Callback<ArrayList<Race>>() {
                 @Override
-                public void onDataLoaded(ArrayList<Race> races) {
+                public void onSuccess(ArrayList<Race> races) {
                     // Sort based on closest to today.
                     int i = 0;
                     while (i < races.size()) {
@@ -141,8 +142,8 @@ public class NextRaceFragment extends Fragment {
                     }
                 }
                 @Override
-                public void onError(String errorMessage) {
-                    System.out.println("Error on retrieval of the races!");
+                public void onError(Exception e){
+                    System.out.println("Error on retrieval of the races: " + e);
                 }
             });
         } catch (Exception e) {
