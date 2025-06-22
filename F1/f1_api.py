@@ -33,6 +33,20 @@ def initialize_firebase():
         print(f"Error occurred during Firebase initialization: {e}")
         return {}
 
+def verify_firebase_token():
+    auth_header = request.headers.get('Authorization', '')
+    if not auth_header.startswith('Bearer '):
+        return None, jsonify({'error': 'Unauthorized: Missing token'}), 401
+
+    id_token = auth_header.split('Bearer ')[1]
+    try:
+        decoded_token = auth.verify_id_token(id_token)
+        return decoded_token['uid'], None, None
+    except Exception as e:
+        print(f"Token verification failed: {e}")
+        return None, jsonify({'error': 'Unauthorized: Invalid token'}), 401
+    
+
 races = initialize_firebase()
 app = Flask(__name__)
 app.config['MAX_CONTENT_PATH'] = 16 * 1000000  # 16MB limit
@@ -47,6 +61,10 @@ def landing_page():
 
 @app.route('/api', methods=['GET'])
 def get_races():
+    uid, error_response, status = verify_firebase_token()
+    if not uid:
+        return error_response, status
+    
     races_with_ids = []
     for id, race in enumerate(races):
         race_with_id = race
