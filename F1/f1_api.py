@@ -2,7 +2,7 @@
 from flask import Flask, jsonify, request, render_template, flash
 
 # Firebase imports
-from firebase_admin import credentials, db, initialize_app
+from firebase_admin import credentials, db, initialize_app, auth
 
 # Extra imports
 import os
