@@ -21,17 +21,22 @@ public class RegisterActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // Set register template.
         setContentView(R.layout.activity_register);
 
+        // Get auth object.
         mAuth = FirebaseAuth.getInstance();
 
+        // Get relevant views.
         editTextEmail = findViewById(R.id.editTextEmail);
         editTextPassword = findViewById(R.id.editTextPassword);
         buttonRegister = findViewById(R.id.buttonRegister);
         buttonBackToLogin = findViewById(R.id.buttonBackToLogin);
 
+        // Add button t call register function.
         buttonRegister.setOnClickListener(v -> registerUser());
 
+        // Add return button to start Login activity.
         buttonBackToLogin.setOnClickListener(v -> {
             Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
             startActivity(intent);
@@ -40,9 +45,11 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     private void registerUser() {
+        // Get email and password from the view.
         String email = editTextEmail.getText().toString().trim();
         String password = editTextPassword.getText().toString().trim();
 
+        // Ensure email and password is valid.
         if (TextUtils.isEmpty(email)) {
             editTextEmail.setError("Email is required");
             return;
@@ -58,14 +65,16 @@ public class RegisterActivity extends AppCompatActivity {
             return;
         }
 
+        // Contact Firebase to try to register a new account.
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
-                        // Registration success → go to MainActivity
+                        // Registration success - Logged in and start MainActivity.
                         Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
                         startActivity(intent);
                         finish();
                     } else {
+                        // Provide error toast.
                         Toast.makeText(RegisterActivity.this,
                                 "Registration failed: " + task.getException().getMessage(),
                                 Toast.LENGTH_LONG).show();

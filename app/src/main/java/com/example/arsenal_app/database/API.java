@@ -3,7 +3,6 @@ package com.example.arsenal_app.database;
 // Imports.
 import static com.example.arsenal_app.Activities.MainActivity.db;
 
-import android.adservices.adselection.AdSelectionOutcome;
 import android.os.Looper;
 
 import com.example.arsenal_app.models.Race;
@@ -12,7 +11,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
-import android.os.Handler;
 
 import okhttp3.Call;
 import okhttp3.OkHttpClient;
@@ -31,44 +29,58 @@ import com.google.gson.JsonArray;
  */
 public class API {
 
-    public void allRacesApiAsync(Callback<ArrayList<Race>> callback) {
-        URL url;
-        try {
-            url = new URL("https://general-personal-app.onrender.com/api");
-        } catch (Exception e) {
-            callback.onError(e);
-            return;
+    private final OkHttpClient client = new OkHttpClient.Builder()
+            .connectTimeout(60, TimeUnit.SECONDS)
+            .readTimeout(90, TimeUnit.SECONDS)
+            .writeTimeout(60, TimeUnit.SECONDS)
+            .build();
+    /**
+     * Function to ensure the user has a valid token before an API call.
+     * @param apiCallback
+     * @param dataStatus Interface implementation to be used as a callback in the event of an
+     *                   error to verify the users token.
+     * @param <T>
+     */
+    public <T> void getValidToken(APICallback<String> apiCallback, DataStatus<T> dataStatus){
+        if (db.get_usid() == null){
+            FirebaseAuth.getInstance().getCurrentUser().getIdToken(true)
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            String idToken = task.getResult().getToken();
+                            db.set_usid(idToken);
+                            apiCallback.onSuccess(idToken);
+                        }else{
+                            dataStatus.onError("Failure to verify user.");
+                        }
+            });
         }
-
-        FirebaseAuth.getInstance().getCurrentUser().getIdToken(true)
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        String idToken = task.getResult().getToken();
-                        db.set_usid(idToken);
-                        System.out.println("Token set! " + idToken);
-
-                        OkHttpClient client = new OkHttpClient.Builder()
-                                .connectTimeout(60, TimeUnit.SECONDS)
-                                .readTimeout(90, TimeUnit.SECONDS)
-                                .writeTimeout(60, TimeUnit.SECONDS)
-                                .build();
-
-                        int maxRetries = 3;
-                        fetchWithRetry(client, url, idToken, maxRetries, callback);
-                    } else {
-                        callback.onError(task.getException());
-                    }
-                });
+        else{
+            apiCallback.onSuccess(db.get_usid());
+        }
     }
 
-    private void fetchWithRetry(OkHttpClient client, URL url, String token, int retriesLeft, Callback<ArrayList<Race>> callback) {
-        System.out.println("Token: " + token);
+    private void fetchWithRetry(OkHttpClient client, URL url, String token, int retriesLeft, BodyCallBack callback) {
         Request request = new Request.Builder()
                 .url(url)
                 .addHeader("Authorization", "Bearer " + token)
                 .build();
 
         client.newCall(request).enqueue(new okhttp3.Callback() {
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                try (ResponseBody responseBody = response.body()) {
+                    if (!response.isSuccessful()) {
+                        callback.onError(("Unexpected code " + response.code()));
+                        return;
+                    }
+
+                    String body = responseBody.string();
+                    callback.onSuccess(body);
+
+                } catch (Exception e) {
+                    callback.onError(e.toString());
+                }
+            }
             @Override
             public void onFailure(Call call, IOException e) {
                 if (retriesLeft > 1) {
@@ -77,68 +89,53 @@ public class API {
                     new android.os.Handler(Looper.getMainLooper()).postDelayed(() ->
                             fetchWithRetry(client, url, token, retriesLeft - 1, callback), 2000);
                 } else {
-                    callback.onError(e);
-                }
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                try (ResponseBody responseBody = response.body()) {
-                    if (!response.isSuccessful()) {
-                        callback.onError(new IOException("Unexpected code " + response.code()));
-                        return;
-                    }
-
-                    String body = responseBody.string();
-                    Gson gson = new Gson();
-                    JsonObject json = gson.fromJson(body, JsonObject.class);
-
-                    int count = json.get("count").getAsInt();
-                    JsonArray racesArray = json.getAsJsonArray("races");
-
-                    ArrayList<Race> raceList = new ArrayList<>();
-                    for (int i = 0; i < count; i++) {
-                        Race race = gson.fromJson(racesArray.get(i), Race.class);
-                        raceList.add(race);
-                    }
-
-                    db.races = raceList;
-
-                    // Return result on main thread
-                    new android.os.Handler(Looper.getMainLooper()).post(() -> callback.onSuccess(raceList));
-                } catch (Exception e) {
-                    callback.onError(e);
+                    callback.onError(e.toString());
                 }
             }
         });
     }
 
-
-
-
-    public static void main(String[] args) throws Exception {
-        /*
-        Testing to ensure the API functionality works correctly.
-         */
-
-        /*
-        // Create API object.
-        API api = new API();
-
-        // Call the function to get the information. DataStatus is used for callback once the data
-        // has been loaded or failed to load.
-        api.get_all_races(new DataStatus<Race>() {
-            @Override
-            public void onDataLoaded(ArrayList<Race> arrayList) {
-                System.out.println("Successful Retrieval of the races!");
-            }
-
-            @Override
-            public void onError(String errorMessage) {
-                System.out.println("Error on retrieval of the races!");
-            }
-        });
+    public void allRacesApiAsync(DataStatus<Race> callback) {
+        URL url;
+        try {
+            url = new URL("https://general-personal-app.onrender.com/api/f1");
+        } catch (Exception e) {
+            callback.onError(e.toString());
+            return;
         }
-        */
+        getValidToken(new APICallback<String>() {
+            @Override
+            public void onSuccess(String usid) {
+                int maxRetries = 3;
+                fetchWithRetry(client, url, usid, maxRetries, new BodyCallBack() {
+                    @Override
+                    public void onSuccess(String body) {
+                        Gson gson = new Gson();
+                        JsonObject json = gson.fromJson(body, JsonObject.class);
+
+                        int count = json.get("count").getAsInt();
+                        JsonArray racesArray = json.getAsJsonArray("races");
+
+                        ArrayList<Race> raceList = new ArrayList<>();
+                        for (int i = 0; i < count; i++) {
+                            Race race = gson.fromJson(racesArray.get(i), Race.class);
+                            raceList.add(race);
+                        }
+                        db.races = raceList;
+
+                        // Return result on main thread
+                        new android.os.Handler(Looper.getMainLooper()).post(() -> callback.onDataLoaded(raceList));
+                    }
+                    @Override
+                    public void onError(String error) {
+                        callback.onError(error);
+                    }
+                });
+            }
+            @Override
+            public void onError(Exception e) {
+                callback.onError(e.toString());
+            }
+        }, callback);
     }
 }

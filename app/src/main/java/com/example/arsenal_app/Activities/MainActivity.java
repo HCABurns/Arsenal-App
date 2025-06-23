@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
 
         if (currentUser == null) {
-            // No logged-in user → redirect to LoginActivity
+            // No logged-in user -> redirect to LoginActivity
             Intent intent = new Intent(MainActivity.this, LoginActivity.class);
             startActivity(intent);
             finish(); // Prevent user from returning here

@@ -72,7 +72,7 @@ public class HomeFragment extends Fragment {
     /**
      * This is a function that will load the data from the database to the page.
      * 1. Call fetchData - This will access the database and return with a callback.
-     * 2. Callback is received and executed: onDataLoaded if returned data otherwise onError.
+     * 2. APICallback is received and executed: onDataLoaded if returned data otherwise onError.
      * Following is for personal learning:
      * DataStatus is an Anonymous class implementation of an interface.
      * db.fetchData only has access to the interface (onDataLoaded and onError)
@@ -173,7 +173,7 @@ public class HomeFragment extends Fragment {
             }
 
             /**
-             * Callback function to display the error message to the user.
+             * APICallback function to display the error message to the user.
              * @param errorMessage - Error message to be displayed to the user.
              */
             @Override
