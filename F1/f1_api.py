@@ -23,7 +23,7 @@ def get_data(ref):
     Returns:
         list: Return a list of dicts of requested data.
     """
-    info = db.reference(ref)
+    info = db.reference(ref).get()
     info_with_ids = []
     for id, data in enumerate(info):
         info_with_id = data
