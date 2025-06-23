@@ -33,8 +33,6 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity {
 
     // Required variables.
-    public static DBHelper db = new DBHelper();
-    public static API api = new API();
     private Fragment previousFragment = null;
 
     /**

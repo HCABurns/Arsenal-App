@@ -1,8 +1,6 @@
 package com.example.arsenal_app.database;
 
 // Imports.
-import static com.example.arsenal_app.Activities.MainActivity.db;
-
 import android.os.Looper;
 
 import com.example.arsenal_app.models.EpicGame;
@@ -46,19 +44,19 @@ public class API {
      * @param <T>
      */
     public <T> void getValidToken(APICallback<String> apiCallback, DataStatus<T> dataStatus) {
-        if (db.get_usid() == null) {
+        if (DataRepository.getInstance().getDbHelper().get_usid() == null) {
             FirebaseAuth.getInstance().getCurrentUser().getIdToken(true)
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
                             String idToken = task.getResult().getToken();
-                            db.set_usid(idToken);
+                            DataRepository.getInstance().getDbHelper().set_usid(idToken);
                             apiCallback.onSuccess(idToken);
                         } else {
                             dataStatus.onError("Failure to verify user.");
                         }
                     });
         } else {
-            apiCallback.onSuccess(db.get_usid());
+            apiCallback.onSuccess(DataRepository.getInstance().getDbHelper().get_usid());
         }
     }
 
@@ -125,7 +123,7 @@ public class API {
                             Race race = gson.fromJson(racesArray.get(i), Race.class);
                             raceList.add(race);
                         }
-                        db.setRaces(raceList);
+                        DataRepository.getInstance().getDbHelper().setRaces(raceList);
 
                         // Return result on main thread
                         new android.os.Handler(Looper.getMainLooper()).post(() -> callback.onDataLoaded(raceList));
@@ -172,7 +170,7 @@ public class API {
                             EpicGame game = gson.fromJson(epicGamesArray.get(i), EpicGame.class);
                             epicGamesList.add(game);
                         }
-                        db.setEpicGames(epicGamesList);
+                        DataRepository.getInstance().getDbHelper().setEpicGames(epicGamesList);
 
                         // Return result on main thread
                         new android.os.Handler(Looper.getMainLooper()).post(() -> callback.onDataLoaded(epicGamesList));
@@ -219,7 +217,7 @@ public class API {
                             Game game = gson.fromJson(footballGamesArray.get(i), Game.class);
                             footballGamesList.add(game);
                         }
-                        db.setGames(footballGamesList);
+                        DataRepository.getInstance().getDbHelper().setGames(footballGamesList);
 
                         // Return result on main thread
                         new android.os.Handler(Looper.getMainLooper()).post(() -> callback.onDataLoaded(footballGamesList));
