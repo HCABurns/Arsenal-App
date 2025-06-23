@@ -46,7 +46,7 @@ public class NextRaceFragment extends Fragment {
         // Load the data into the page via API call.
         API api = new API();
         try {
-            api.get_all_races(new DataStatus<Race>() {
+            api.allRacesApiAsync(new DataStatus<Race>() {
                 @Override
                 public void onDataLoaded(ArrayList<Race> races) {
                     // Sort based on closest to today.
@@ -141,8 +141,8 @@ public class NextRaceFragment extends Fragment {
                     }
                 }
                 @Override
-                public void onError(String errorMessage) {
-                    System.out.println("Error on retrieval of the races!");
+                public void onError(String e){
+                    System.out.println("Error on retrieval of the races: " + e);
                 }
             });
         } catch (Exception e) {

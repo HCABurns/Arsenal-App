@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.os.Bundle;
+
 import com.example.arsenal_app.R;
 import com.example.arsenal_app.database.DBHelper;
 import com.example.arsenal_app.fragments.EpicFragment;
@@ -13,6 +14,10 @@ import com.example.arsenal_app.fragments.FutureFragment;
 import com.example.arsenal_app.fragments.NextRaceFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.FirebaseApp;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import android.content.Intent;
 
 
 /**
@@ -32,8 +37,20 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
 
+        // Get currentUser, if not then start the login activity.
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+
+        if (currentUser == null) {
+            // No logged-in user -> redirect to LoginActivity
+            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+            startActivity(intent);
+            finish(); // Prevent user from returning here
+            return; // Don't proceed to load UI
+        }
+
+        // Sets the banner and navigation bar.
+        setContentView(R.layout.activity_main);
         // Initialize the Firebase app.
         FirebaseApp.initializeApp(this);
 
@@ -77,7 +94,6 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
             else if (item.getItemId() == R.id.next_race_nav_bar){
-                System.out.println("Next_nav_bar");
                 t.hide(previousFragment).show(nextRaceFragment).commit();
                 previousFragment = nextRaceFragment;
                 return true;
