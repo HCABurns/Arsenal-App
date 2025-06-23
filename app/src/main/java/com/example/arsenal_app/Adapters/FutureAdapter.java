@@ -21,13 +21,7 @@ import java.util.ArrayList;
 
 public class FutureAdapter extends RecyclerView.Adapter<FutureAdapter.ViewHolder> {
 
-    private ArrayList<Game> games = db.games;
-
-    public FutureAdapter(){
-
-        System.out.println("AA: " + games.size());
-
-    }
+    private ArrayList<Game> games = db.getGames();
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         private TextView competition;

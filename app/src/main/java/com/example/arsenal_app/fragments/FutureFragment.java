@@ -40,12 +40,12 @@ public class FutureFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_future, container, false);
 
-        if (db.games.size() == 0) {
+        if (db.getGames().size() == 0) {
             try {
                 api.allFootballGamesApiAsync(new DataStatus<Game>() {
                     @Override
                     public void onDataLoaded(ArrayList<Game> dataList) {
-                        db.games = dataList;
+                        db.setGames(dataList);
                         recyclerView = view.findViewById(R.id.future_games_recycler);
                         futureAdapter = new FutureAdapter();
                         recyclerView.setAdapter(futureAdapter);
@@ -63,7 +63,7 @@ public class FutureFragment extends Fragment {
             }
         }
 
-        if (db.games.size() != 0) {
+        if (db.getGames().size() != 0) {
             recyclerView = view.findViewById(R.id.future_games_recycler);
             futureAdapter = new FutureAdapter();
             recyclerView.setAdapter(futureAdapter);

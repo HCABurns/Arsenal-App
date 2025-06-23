@@ -21,7 +21,7 @@ import java.util.ArrayList;
 
 public class EpicAdapter extends RecyclerView.Adapter<EpicAdapter.ViewHolder> {
 
-    private ArrayList<EpicGame> games = db.epicGames;
+    private ArrayList<EpicGame> games = db.getEpicGames();
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         private TextView name;

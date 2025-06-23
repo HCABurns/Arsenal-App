@@ -125,7 +125,7 @@ public class API {
                             Race race = gson.fromJson(racesArray.get(i), Race.class);
                             raceList.add(race);
                         }
-                        db.races = raceList;
+                        db.setRaces(raceList);
 
                         // Return result on main thread
                         new android.os.Handler(Looper.getMainLooper()).post(() -> callback.onDataLoaded(raceList));
@@ -165,14 +165,14 @@ public class API {
                         JsonObject json = gson.fromJson(body, JsonObject.class);
 
                         int count = json.get("count").getAsInt();
-                        JsonArray epicGamesArray = json.getAsJsonArray("races");
+                        JsonArray epicGamesArray = json.getAsJsonArray("epic_games");
 
                         ArrayList<EpicGame> epicGamesList = new ArrayList<>();
                         for (int i = 0; i < count; i++) {
                             EpicGame game = gson.fromJson(epicGamesArray.get(i), EpicGame.class);
                             epicGamesList.add(game);
                         }
-                        db.epicGames = epicGamesList;
+                        db.setEpicGames(epicGamesList);
 
                         // Return result on main thread
                         new android.os.Handler(Looper.getMainLooper()).post(() -> callback.onDataLoaded(epicGamesList));
@@ -212,14 +212,14 @@ public class API {
                         JsonObject json = gson.fromJson(body, JsonObject.class);
 
                         int count = json.get("count").getAsInt();
-                        JsonArray footballGamesArray = json.getAsJsonArray("races");
+                        JsonArray footballGamesArray = json.getAsJsonArray("football");
 
                         ArrayList<Game> footballGamesList = new ArrayList<>();
                         for (int i = 0; i < count; i++) {
                             Game game = gson.fromJson(footballGamesArray.get(i), Game.class);
                             footballGamesList.add(game);
                         }
-                        db.games = footballGamesList;
+                        db.setGames(footballGamesList);
 
                         // Return result on main thread
                         new android.os.Handler(Looper.getMainLooper()).post(() -> callback.onDataLoaded(footballGamesList));
