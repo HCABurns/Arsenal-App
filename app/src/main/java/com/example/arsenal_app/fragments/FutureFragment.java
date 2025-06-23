@@ -1,5 +1,8 @@
 package com.example.arsenal_app.fragments;
 
+import static com.example.arsenal_app.Activities.MainActivity.api;
+import static com.example.arsenal_app.Activities.MainActivity.db;
+
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -12,6 +15,10 @@ import android.view.ViewGroup;
 
 import com.example.arsenal_app.Adapters.FutureAdapter;
 import com.example.arsenal_app.R;
+import com.example.arsenal_app.database.DataStatus;
+import com.example.arsenal_app.models.Game;
+
+import java.util.ArrayList;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -21,10 +28,6 @@ public class FutureFragment extends Fragment {
 
     private RecyclerView recyclerView;
     public static FutureAdapter futureAdapter;
-
-    public FutureFragment() {
-        // Required empty public constructor
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -37,12 +40,36 @@ public class FutureFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_future, container, false);
 
-        recyclerView = view.findViewById(R.id.future_games_recycler);
+        if (db.getGames().size() == 0) {
+            try {
+                api.allFootballGamesApiAsync(new DataStatus<Game>() {
+                    @Override
+                    public void onDataLoaded(ArrayList<Game> dataList) {
+                        db.setGames(dataList);
+                        recyclerView = view.findViewById(R.id.future_games_recycler);
+                        futureAdapter = new FutureAdapter();
+                        recyclerView.setAdapter(futureAdapter);
+                        recyclerView.setLayoutManager(new LinearLayoutManager(getContext(),
+                                LinearLayoutManager.VERTICAL, false));
+                    }
 
-        futureAdapter = new FutureAdapter();
-        recyclerView.setAdapter(futureAdapter);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext(),
-                LinearLayoutManager.VERTICAL, false));
+                    @Override
+                    public void onError(String errorMessage) {
+
+                    }
+                });
+            } catch (Exception e) {
+                System.out.println(e.toString());
+            }
+        }
+
+        if (db.getGames().size() != 0) {
+            recyclerView = view.findViewById(R.id.future_games_recycler);
+            futureAdapter = new FutureAdapter();
+            recyclerView.setAdapter(futureAdapter);
+            recyclerView.setLayoutManager(new LinearLayoutManager(getContext(),
+                    LinearLayoutManager.VERTICAL, false));
+        }
         return view;
     }
 }

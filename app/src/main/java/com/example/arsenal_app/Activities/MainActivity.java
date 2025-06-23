@@ -7,17 +7,23 @@ import androidx.fragment.app.FragmentTransaction;
 import android.os.Bundle;
 
 import com.example.arsenal_app.R;
+import com.example.arsenal_app.database.API;
 import com.example.arsenal_app.database.DBHelper;
+import com.example.arsenal_app.database.DataStatus;
 import com.example.arsenal_app.fragments.EpicFragment;
 import com.example.arsenal_app.fragments.HomeFragment;
 import com.example.arsenal_app.fragments.FutureFragment;
 import com.example.arsenal_app.fragments.NextRaceFragment;
+import com.example.arsenal_app.models.Game;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.FirebaseApp;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import android.content.Intent;
+import android.view.View;
+
+import java.util.ArrayList;
 
 
 /**
@@ -28,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
 
     // Required variables.
     public static DBHelper db = new DBHelper();
+    public static API api = new API();
     private Fragment previousFragment = null;
 
     /**

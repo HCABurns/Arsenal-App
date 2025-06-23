@@ -167,7 +167,7 @@ def get_games():
     uid, error_response, status = verify_firebase_token()
     if not uid:
         return error_response, status
-    return {"races":football_games,"count":len(epic_games)}, 200
+    return {"football":football_games,"count":len(football_games)}, 200
 
 
 @app.route('/api/epic_games', methods=['GET'])
@@ -186,7 +186,7 @@ def get_epic_games():
     uid, error_response, status = verify_firebase_token()
     if not uid:
         return error_response, status
-    return {"races":epic_games,"count":len(epic_games)}, 200
+    return {"epic_games":epic_games,"count":len(epic_games)}, 200
 
 
 @app.errorhandler(404)
