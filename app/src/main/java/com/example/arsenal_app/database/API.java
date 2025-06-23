@@ -5,6 +5,8 @@ import static com.example.arsenal_app.Activities.MainActivity.db;
 
 import android.os.Looper;
 
+import com.example.arsenal_app.models.EpicGame;
+import com.example.arsenal_app.models.Game;
 import com.example.arsenal_app.models.Race;
 
 import java.io.IOException;
@@ -34,27 +36,28 @@ public class API {
             .readTimeout(90, TimeUnit.SECONDS)
             .writeTimeout(60, TimeUnit.SECONDS)
             .build();
+
     /**
      * Function to ensure the user has a valid token before an API call.
+     *
      * @param apiCallback
-     * @param dataStatus Interface implementation to be used as a callback in the event of an
-     *                   error to verify the users token.
+     * @param dataStatus  Interface implementation to be used as a callback in the event of an
+     *                    error to verify the users token.
      * @param <T>
      */
-    public <T> void getValidToken(APICallback<String> apiCallback, DataStatus<T> dataStatus){
-        if (db.get_usid() == null){
+    public <T> void getValidToken(APICallback<String> apiCallback, DataStatus<T> dataStatus) {
+        if (db.get_usid() == null) {
             FirebaseAuth.getInstance().getCurrentUser().getIdToken(true)
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
                             String idToken = task.getResult().getToken();
                             db.set_usid(idToken);
                             apiCallback.onSuccess(idToken);
-                        }else{
+                        } else {
                             dataStatus.onError("Failure to verify user.");
                         }
-            });
-        }
-        else{
+                    });
+        } else {
             apiCallback.onSuccess(db.get_usid());
         }
     }
@@ -81,6 +84,7 @@ public class API {
                     callback.onError(e.toString());
                 }
             }
+
             @Override
             public void onFailure(Call call, IOException e) {
                 if (retriesLeft > 1) {
@@ -126,12 +130,108 @@ public class API {
                         // Return result on main thread
                         new android.os.Handler(Looper.getMainLooper()).post(() -> callback.onDataLoaded(raceList));
                     }
+
                     @Override
                     public void onError(String error) {
                         callback.onError(error);
                     }
                 });
             }
+
+            @Override
+            public void onError(Exception e) {
+                callback.onError(e.toString());
+            }
+        }, callback);
+    }
+
+
+    public void allEpicGamesApiAsync(DataStatus<EpicGame> callback) {
+        URL url;
+        try {
+            url = new URL("https://general-personal-app.onrender.com/api/epic_games");
+        } catch (Exception e) {
+            callback.onError(e.toString());
+            return;
+        }
+        getValidToken(new APICallback<String>() {
+            @Override
+            public void onSuccess(String usid) {
+                int maxRetries = 3;
+                fetchWithRetry(client, url, usid, maxRetries, new BodyCallBack() {
+                    @Override
+                    public void onSuccess(String body) {
+                        Gson gson = new Gson();
+                        JsonObject json = gson.fromJson(body, JsonObject.class);
+
+                        int count = json.get("count").getAsInt();
+                        JsonArray epicGamesArray = json.getAsJsonArray("races");
+
+                        ArrayList<EpicGame> epicGamesList = new ArrayList<>();
+                        for (int i = 0; i < count; i++) {
+                            EpicGame game = gson.fromJson(epicGamesArray.get(i), EpicGame.class);
+                            epicGamesList.add(game);
+                        }
+                        db.epicGames = epicGamesList;
+
+                        // Return result on main thread
+                        new android.os.Handler(Looper.getMainLooper()).post(() -> callback.onDataLoaded(epicGamesList));
+                    }
+
+                    @Override
+                    public void onError(String error) {
+                        callback.onError(error);
+                    }
+                });
+            }
+
+            @Override
+            public void onError(Exception e) {
+                callback.onError(e.toString());
+            }
+        }, callback);
+    }
+
+
+    public void allFootballGamesApiAsync(DataStatus<Game> callback) {
+        URL url;
+        try {
+            url = new URL("https://general-personal-app.onrender.com/api/football");
+        } catch (Exception e) {
+            callback.onError(e.toString());
+            return;
+        }
+        getValidToken(new APICallback<String>() {
+            @Override
+            public void onSuccess(String usid) {
+                int maxRetries = 3;
+                fetchWithRetry(client, url, usid, maxRetries, new BodyCallBack() {
+                    @Override
+                    public void onSuccess(String body) {
+                        Gson gson = new Gson();
+                        JsonObject json = gson.fromJson(body, JsonObject.class);
+
+                        int count = json.get("count").getAsInt();
+                        JsonArray footballGamesArray = json.getAsJsonArray("races");
+
+                        ArrayList<Game> footballGamesList = new ArrayList<>();
+                        for (int i = 0; i < count; i++) {
+                            Game game = gson.fromJson(footballGamesArray.get(i), Game.class);
+                            footballGamesList.add(game);
+                        }
+                        db.games = footballGamesList;
+
+                        // Return result on main thread
+                        new android.os.Handler(Looper.getMainLooper()).post(() -> callback.onDataLoaded(footballGamesList));
+                    }
+
+                    @Override
+                    public void onError(String error) {
+                        callback.onError(error);
+                    }
+                });
+            }
+
             @Override
             public void onError(Exception e) {
                 callback.onError(e.toString());

@@ -2,14 +2,24 @@
 
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/epic_recycler_frame"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
+    android:visibility="invisible"
     tools:context=".fragments.EpicFragment">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/epic_games_recycler"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:nestedScrollingEnabled="false"/>
+        android:nestedScrollingEnabled="false" />
+
+    <ProgressBar
+        android:id="@+id/epic_game_progress_bar"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="102dp"
+        android:layout_height="140dp"
+        android:layout_gravity="center"
+        android:visibility="visible" />
 </FrameLayout>

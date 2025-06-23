@@ -1,5 +1,7 @@
 package com.example.arsenal_app.fragments;
 
+import static com.example.arsenal_app.Activities.MainActivity.api;
+
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -44,7 +46,6 @@ public class NextRaceFragment extends Fragment {
         TextView circuitView = view.findViewById(R.id.next_race_circuit);
 
         // Load the data into the page via API call.
-        API api = new API();
         try {
             api.allRacesApiAsync(new DataStatus<Race>() {
                 @Override
