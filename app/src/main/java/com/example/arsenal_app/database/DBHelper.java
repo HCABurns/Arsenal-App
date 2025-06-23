@@ -24,6 +24,7 @@ public class DBHelper {
 
     private DatabaseReference footballGamesDatabase;
     private DatabaseReference epicGamesDatabase;
+    private String usid;
 
     public DBHelper(){
         // Define the references to the database.
@@ -55,17 +56,17 @@ public class DBHelper {
                     games.add(game);
                 }
 
-                // Callback using the data that has been read in.
+                // APICallback using the data that has been read in.
                 dataStatus.onDataLoaded(games);
             }
 
             /**
-             * Callback with an error message if an error occurs.
+             * APICallback with an error message if an error occurs.
              * @param databaseError A description of the error that occurred.
              */
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-                // Callback with the error message.
+                // APICallback with the error message.
                 dataStatus.onError(databaseError.getMessage());
             }
         });
@@ -87,17 +88,17 @@ public class DBHelper {
                     System.out.println(game.toString());
                 }
 
-                // Callback using the data that has been read in.
+                // APICallback using the data that has been read in.
                 dataStatus.onDataLoaded(epicGames);
             }
 
             /**
-             * Callback with an error message if an error occurs.
+             * APICallback with an error message if an error occurs.
              * @param databaseError A description of the error that occurred.
              */
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-                // Callback with the error message.
+                // APICallback with the error message.
                 dataStatus.onError(databaseError.getMessage());
             }
         });
@@ -125,4 +126,13 @@ public class DBHelper {
             }
         });
     }
+
+    public void set_usid(String idToken){
+        this.usid = idToken;
+    }
+
+    public String get_usid(){
+        return this.usid;
+    }
+
 }

@@ -20,20 +20,12 @@ import com.example.arsenal_app.database.API;
 import com.example.arsenal_app.database.DataStatus;
 import com.example.arsenal_app.models.Race;
 
-import org.w3c.dom.Text;
-
 import java.text.MessageFormat;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 public class NextRaceFragment extends Fragment {
-
-    private ProgressBar progressBar;
-
-    public NextRaceFragment() {
-        // Required empty public constructor
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -51,14 +43,12 @@ public class NextRaceFragment extends Fragment {
         TextView dateView = view.findViewById(R.id.next_race_date);
         TextView circuitView = view.findViewById(R.id.next_race_circuit);
 
-        // Load the data into the page.
+        // Load the data into the page via API call.
         API api = new API();
         try {
-            api.get_all_races(new DataStatus<Race>() {
+            api.allRacesApiAsync(new DataStatus<Race>() {
                 @Override
                 public void onDataLoaded(ArrayList<Race> races) {
-                    System.out.println("Successful Retrieval of the races!");
-
                     // Sort based on closest to today.
                     int i = 0;
                     while (i < races.size()) {
@@ -100,8 +90,7 @@ public class NextRaceFragment extends Fragment {
                             milliseconds = Duration.between(now,nextRaceDateTime).getSeconds() * 1000;
                         }
 
-                        System.out.println(milliseconds);
-
+                        // If the race is older than 2 hours long, find the next one.
                         if (milliseconds < -7200000){
                             i+=1;
                             continue;
@@ -136,7 +125,7 @@ public class NextRaceFragment extends Fragment {
 
 
                             /**
-                             * Once the countdown reaches 0, display a game started message.
+                             * Once the countdown reaches 0, display a race started message.
                              */
                             @Override
                             public void onFinish() {
@@ -151,28 +140,14 @@ public class NextRaceFragment extends Fragment {
                         break;
                     }
                 }
-
-
-
                 @Override
-                public void onError(String errorMessage) {
-                    System.out.println("Error on retrieval of the races!");
+                public void onError(String e){
+                    System.out.println("Error on retrieval of the races: " + e);
                 }
             });
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-
-        // Inflate the layout for this fragment
-        //view = inflater.inflate(R.layout.next_race, container, false);
-        System.out.println("------------------ VIEW HAS BEEN RETURED FOR NEXT FACE FRAGMENT");
         return view;
     }
-
-    public void load(){
-
-
-
-    }
-
 }
