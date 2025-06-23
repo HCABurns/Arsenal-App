@@ -1,5 +1,6 @@
 package com.example.arsenal_app.fragments;
 
+import static com.example.arsenal_app.Activities.MainActivity.api;
 import static com.example.arsenal_app.Activities.MainActivity.db;
 
 import android.graphics.Bitmap;
@@ -18,6 +19,7 @@ import androidx.fragment.app.Fragment;
 import com.example.arsenal_app.R;
 import com.example.arsenal_app.database.DataStatus;
 import com.example.arsenal_app.models.Game;
+import com.example.arsenal_app.models.Race;
 
 import java.text.MessageFormat;
 import java.time.Duration;
@@ -43,10 +45,6 @@ public class HomeFragment extends Fragment {
     private ImageView opponentBadgeView;
     private ProgressBar progressBar;
 
-    public HomeFragment() {
-        // Required empty public constructor
-    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -64,124 +62,104 @@ public class HomeFragment extends Fragment {
         opponentBadgeView = view.findViewById(R.id.next_opponent_opponentBadge);
 
         // Load the data into the page.
-        load();
+        try {
+            api.allFootballGamesApiAsync(new DataStatus<Game>() {
+                @Override
+                public void onDataLoaded(ArrayList<Game> dataList) {
+                    progressBar.setVisibility(View.GONE);
 
-        return view;
-    }
+                    int i = 0;
+                    long milliseconds = -1;
 
-    /**
-     * This is a function that will load the data from the database to the page.
-     * 1. Call fetchData - This will access the database and return with a callback.
-     * 2. APICallback is received and executed: onDataLoaded if returned data otherwise onError.
-     * Following is for personal learning:
-     * DataStatus is an Anonymous class implementation of an interface.
-     * db.fetchData only has access to the interface (onDataLoaded and onError)
-     * It can't access the public string as it only accesses the interface - The public string is
-     * is a local scope variable. A getter or callback would be used to access.
-     */
-    private void load(){
-        db.fetchData(new DataStatus<Game>() {
-            public String fetchCantAccessMe="";
-            @Override
-            public void onDataLoaded(ArrayList<Game> dataList) {
-                // Set the loading bar to invisible.
-                progressBar.setVisibility(View.INVISIBLE);
+                    while (true) {
+                        // Get next match.
+                        Game game = dataList.get(i);
 
-                int i = 0;
-                long milliseconds = -1;
+                        // Update all the views with the information. (Note: Date is done separate)
+                        competitionView.setText(game.getCompetition());
+                        opponentView.setText(game.getOpponent());
+                        stadiumView.setText(game.getStadium());
+                        dateView.setText(game.getDateFormatted());
+                        timeView.setText(game.getTimeFormatted());
 
-                while (true) {
-                    // Get next match.
-                    Game game = dataList.get(i);
+                        // Convert the base 64 to a bitmap image and set.
+                        byte[] base64 = Base64.decode(game.getBadge_base64(), Base64.DEFAULT);
+                        Bitmap bitmap = BitmapFactory.decodeByteArray(base64, 0, base64.length);
+                        opponentBadgeView.setImageBitmap(bitmap);
 
-                    // Update all the views with the information. (Note: Date is done separate)
-                    competitionView.setText(game.getCompetition());
-                    opponentView.setText(game.getOpponent());
-                    stadiumView.setText(game.getStadium());
-                    dateView.setText(game.getDateFormatted());
-                    timeView.setText(game.getTimeFormatted());
+                        // Find the milliseconds between next game and now.
+                        LocalDateTime pastDateTime;
+                        LocalDateTime now;
 
-                    // Convert the base 64 to a bitmap image and set.
-                    byte[] base64 = Base64.decode(game.getBadge_base64(), Base64.DEFAULT);
-                    Bitmap bitmap = BitmapFactory.decodeByteArray(base64, 0, base64.length);
-                    opponentBadgeView.setImageBitmap(bitmap);
+                        String[] dateParts = game.getDate().split("-");
+                        int year = Integer.parseInt(dateParts[0]);
+                        int month = Integer.parseInt(dateParts[1]);
+                        int day = Integer.parseInt(dateParts[2]);
+                        // todo: Decide on if leaving in 24h format or change to 12h with am/pm
 
-                    // Find the milliseconds between next game and now.
-                    LocalDateTime pastDateTime;
-                    LocalDateTime now;
+                        String[] timeParts = game.getTime().split(":");
+                        int hours = Integer.parseInt(timeParts[0]);
+                        int minutes = Integer.parseInt(timeParts[1]);
+                        int seconds = Integer.parseInt(timeParts[2]);
 
-                    String[] dateParts = game.getDate().split("-");
-                    int year = Integer.parseInt(dateParts[0]);
-                    int month = Integer.parseInt(dateParts[1]);
-                    int day = Integer.parseInt(dateParts[2]);
-                    // todo: Decide on if leaving in 24h format or change to 12h with am/pm
-
-                    String[] timeParts = game.getTime().split(":");
-                    int hours = Integer.parseInt(timeParts[0]);
-                    int minutes = Integer.parseInt(timeParts[1]);
-                    int seconds = Integer.parseInt(timeParts[2]);
-
-                    milliseconds = -1;
-                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                        pastDateTime = LocalDateTime.of(year, month, day, hours, minutes, seconds);
-                        now = LocalDateTime.now();
-                        milliseconds = Duration.between(now, pastDateTime).getSeconds() * 1000;
-                    }
-
-                    System.out.println(milliseconds);
-                    if (milliseconds > -7200000){
-                        break;
-                    }
-                    i+=1;
-                }
-
-                // Set the countdown and decrement every second.
-                new CountDownTimer(milliseconds, 1000){
-                    @Override
-                    public void onTick(long milliRemaining) {
-                        // Find the remaining days, hours, minutes and seconds.
-                        int days = (int) (milliRemaining / (1000.0 * 60.0 * 60.0 * 24.0));
-                        milliRemaining -= days * (1000.0 * 60.0 * 60.0 * 24.0);
-                        int hours = (int) (milliRemaining / (1000.0 * 60.0 * 60.0));
-                        milliRemaining -= hours * (1000.0 * 60.0 * 60.0);
-                        int minutes = (int) (milliRemaining / (1000.0 * 60.0));
-                        milliRemaining -= minutes * (1000.0 * 60.0);
-                        int seconds = (int) (milliRemaining / (1000.0));
-                        // Display the correct format based on available information.
-                        if (days > 0) {
-                            countdownView.setText(MessageFormat.format("{0}D {1}H {2}M {3}S",
-                                    days, hours, minutes, seconds));
-                        } else if (hours > 0){
-                            countdownView.setText(MessageFormat.format("{0}H {1}M {2}S",
-                                    hours, minutes, seconds));
-                        } else if (minutes > 0) {
-                            countdownView.setText(MessageFormat.format("{0}M {1}S",
-                                    minutes, seconds));
-                        } else{
-                            countdownView.setText(MessageFormat.format("{0}S", seconds));
+                        milliseconds = -1;
+                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                            pastDateTime = LocalDateTime.of(year, month, day, hours, minutes, seconds);
+                            now = LocalDateTime.now();
+                            milliseconds = Duration.between(now, pastDateTime).getSeconds() * 1000;
                         }
+
+                        System.out.println(milliseconds);
+                        if (milliseconds > -7200000){
+                            break;
+                        }
+                        i+=1;
                     }
 
-                    /**
-                     * Once the countdown reaches 0, display a game started message.
-                     */
-                    @Override
-                    public void onFinish() {
-                        countdownView.setText(R.string.countdown_finished);
-                    }
-                }.start();
-            }
+                    // Set the countdown and decrement every second.
+                    new CountDownTimer(milliseconds, 1000){
+                        @Override
+                        public void onTick(long milliRemaining) {
+                            // Find the remaining days, hours, minutes and seconds.
+                            int days = (int) (milliRemaining / (1000.0 * 60.0 * 60.0 * 24.0));
+                            milliRemaining -= days * (1000.0 * 60.0 * 60.0 * 24.0);
+                            int hours = (int) (milliRemaining / (1000.0 * 60.0 * 60.0));
+                            milliRemaining -= hours * (1000.0 * 60.0 * 60.0);
+                            int minutes = (int) (milliRemaining / (1000.0 * 60.0));
+                            milliRemaining -= minutes * (1000.0 * 60.0);
+                            int seconds = (int) (milliRemaining / (1000.0));
+                            // Display the correct format based on available information.
+                            if (days > 0) {
+                                countdownView.setText(MessageFormat.format("{0}D {1}H {2}M {3}S",
+                                        days, hours, minutes, seconds));
+                            } else if (hours > 0){
+                                countdownView.setText(MessageFormat.format("{0}H {1}M {2}S",
+                                        hours, minutes, seconds));
+                            } else if (minutes > 0) {
+                                countdownView.setText(MessageFormat.format("{0}M {1}S",
+                                        minutes, seconds));
+                            } else{
+                                countdownView.setText(MessageFormat.format("{0}S", seconds));
+                            }
+                        }
 
-            /**
-             * APICallback function to display the error message to the user.
-             * @param errorMessage - Error message to be displayed to the user.
-             */
-            @Override
-            public void onError(String errorMessage) {
-                // Set the top line of text to the error message.
-                competitionView.setText(errorMessage);
-                this.fetchCantAccessMe=""; //Added to remove warning
-            }
-        });
+                        /**
+                         * Once the countdown reaches 0, display a game started message.
+                         */
+                        @Override
+                        public void onFinish() {
+                            countdownView.setText(R.string.countdown_finished);
+                        }
+                    }.start();
+                }
+                @Override
+                public void onError(String errorMessage) {
+                    System.out.println("HomePage Loading error: "+errorMessage);
+                }
+            });
+        }catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return view;
     }
 }
