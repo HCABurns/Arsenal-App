@@ -1,7 +1,5 @@
 package com.example.arsenal_app.Adapters;
 
-import static com.example.arsenal_app.Activities.MainActivity.db;
-
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Base64;
@@ -15,13 +13,14 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.arsenal_app.R;
+import com.example.arsenal_app.database.DataRepository;
 import com.example.arsenal_app.models.Game;
 
 import java.util.ArrayList;
 
 public class FutureAdapter extends RecyclerView.Adapter<FutureAdapter.ViewHolder> {
 
-    private ArrayList<Game> games = db.getGames();
+    private ArrayList<Game> games = DataRepository.getInstance().getDbHelper().getGames();
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         private TextView competition;

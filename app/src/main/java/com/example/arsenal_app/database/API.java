@@ -1,18 +1,14 @@
 package com.example.arsenal_app.database;
 
 // Imports.
-import static com.example.arsenal_app.Activities.MainActivity.db;
-
 import android.os.Looper;
-
-import com.example.arsenal_app.models.EpicGame;
-import com.example.arsenal_app.models.Game;
-import com.example.arsenal_app.models.Race;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 import okhttp3.Call;
 import okhttp3.OkHttpClient;
@@ -31,57 +27,92 @@ import com.google.gson.JsonArray;
  */
 public class API {
 
+    // List to store all callbacks while waiting for token retrieval.
+    private final List<APICallback<String>> tokenCallbacksHolder = new ArrayList<>();
+    // Flag to indicate if the token is being fetched.
+    private boolean isFetchingToken = false;
+    // Client object to perform HTTP requests to the API server.
     private final OkHttpClient client = new OkHttpClient.Builder()
             .connectTimeout(60, TimeUnit.SECONDS)
             .readTimeout(90, TimeUnit.SECONDS)
-            .writeTimeout(60, TimeUnit.SECONDS)
+            .writeTimeout(0, TimeUnit.SECONDS)
             .build();
+    // Handler object to allow for return on the main thread.
+    private final android.os.Handler mainHandler = new android.os.Handler(Looper.getMainLooper());
+
 
     /**
-     * Function to ensure the user has a valid token before an API call.
+     * Function to ensure the user has a valid token before an API call. Uses a list of callback
+     * objects to ensure only one instance tries to access the token and improving efficiency.
      *
-     * @param apiCallback
+     * @param apiCallback Interface implementation to be used upon successful retrieval of the
+     *                    users token.
      * @param dataStatus  Interface implementation to be used as a callback in the event of an
      *                    error to verify the users token.
-     * @param <T>
+     * @param <T> Class type of the data that is requested.
      */
     public <T> void getValidToken(APICallback<String> apiCallback, DataStatus<T> dataStatus) {
-        if (db.get_usid() == null) {
+
+        // If the userID is already
+        if (DataRepository.getInstance().getDbHelper().get_usid() == null) {
+            // Check if the token is already being retrieved. - Add to holder if true otherwise
+            // set flag and run the code to get the token.
+            if (isFetchingToken){
+                tokenCallbacksHolder.add(apiCallback);
+                return;
+            }
+            isFetchingToken = true;
             FirebaseAuth.getInstance().getCurrentUser().getIdToken(true)
                     .addOnCompleteListener(task -> {
+                        // Upon token being retrieved, store and return via callback(s).
                         if (task.isSuccessful()) {
                             String idToken = task.getResult().getToken();
-                            db.set_usid(idToken);
+                            DataRepository.getInstance().getDbHelper().set_usid(idToken);
+
+                            for (APICallback<String> apiCallback1 : tokenCallbacksHolder){
+                                apiCallback1.onSuccess(idToken);
+                            }
                             apiCallback.onSuccess(idToken);
+                            isFetchingToken = false;
                         } else {
                             dataStatus.onError("Failure to verify user.");
                         }
                     });
         } else {
-            apiCallback.onSuccess(db.get_usid());
+            // Return the already cached token.
+            apiCallback.onSuccess(DataRepository.getInstance().getDbHelper().get_usid());
         }
     }
 
-    private void fetchWithRetry(OkHttpClient client, URL url, String token, int retriesLeft, BodyCallBack callback) {
+    /**
+     * This function will connect to the URL and attempt to retrieve data.
+     *
+     * @param url The API url to be connected to.
+     * @param token The users token to be sent as a header to the API for authenticated.
+     * @param retriesLeft Integer of the number of retries left upon
+     * @param callback Callback object to return the data from the URL.
+     */
+    private void fetchWithRetry(URL url, String token, int retriesLeft, BodyCallBack callback) {
+        // Create the request.
         Request request = new Request.Builder()
                 .url(url)
                 .addHeader("Authorization", "Bearer " + token)
                 .build();
 
+        // Create a call to the URL and retrieve the data and return via callback.
         client.newCall(request).enqueue(new okhttp3.Callback() {
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
+            public void onResponse(Call call, Response response){
                 try (ResponseBody responseBody = response.body()) {
                     if (!response.isSuccessful()) {
                         callback.onError(("Unexpected code " + response.code()));
                         return;
                     }
-
                     String body = responseBody.string();
                     callback.onSuccess(body);
 
                 } catch (Exception e) {
-                    callback.onError(e.toString());
+                    callback.onError("CLIENT NEW CALL ERROR: " + e);
                 }
             }
 
@@ -89,152 +120,80 @@ public class API {
             public void onFailure(Call call, IOException e) {
                 if (retriesLeft > 1) {
                     System.out.println("Attempt failed: " + e.getMessage() + ". Retrying...");
-                    // Try again after delay
+                    // Try again after delay.
                     new android.os.Handler(Looper.getMainLooper()).postDelayed(() ->
-                            fetchWithRetry(client, url, token, retriesLeft - 1, callback), 2000);
+                            fetchWithRetry(url, token, retriesLeft - 1, callback), 2000);
                 } else {
-                    callback.onError(e.toString());
+                    callback.onError("Fetch with retry error: " + e);
                 }
             }
         });
     }
 
-    public void allRacesApiAsync(DataStatus<Race> callback) {
-        URL url;
+    /**
+     * Function will connect to the url and retrieve the json data from the API and return it as
+     * an ArrayList of Objects of type <T>.
+     *
+     * @param APIUrl URL of the API.
+     * @param jsonArrayKey Key of the information.
+     * @param clazz This is the class relating to the object to be created with the data.
+     * @param callback Callback object to return the arrayList once the data has been read.
+     * @param functionSetter Consumer object of the function that will cache the data once it
+     *                       has been read.
+     * @param <T> Type of the object.
+     */
+    public <T> void fetchData(String APIUrl,
+                              String jsonArrayKey,
+                              Class<T> clazz,
+                              DataStatus<T> callback,
+                              Consumer<ArrayList<T>> functionSetter) {
+        // Get URL object.
+        URL url = null;
         try {
-            url = new URL("https://general-personal-app.onrender.com/api/f1");
+            url = new URL(APIUrl);
         } catch (Exception e) {
             callback.onError(e.toString());
-            return;
         }
+        URL finalUrl = url;
+
+        // Get the token of the user.
         getValidToken(new APICallback<String>() {
             @Override
             public void onSuccess(String usid) {
-                int maxRetries = 3;
-                fetchWithRetry(client, url, usid, maxRetries, new BodyCallBack() {
+                int maxRetries = 2;
+                // Fetch the information from the URL.
+                fetchWithRetry(finalUrl, usid, maxRetries, new BodyCallBack() {
                     @Override
                     public void onSuccess(String body) {
+                        // Set information to be an ArrayList of objects of clazz.
                         Gson gson = new Gson();
                         JsonObject json = gson.fromJson(body, JsonObject.class);
 
                         int count = json.get("count").getAsInt();
-                        JsonArray racesArray = json.getAsJsonArray("races");
+                        JsonArray itemArray = json.getAsJsonArray(jsonArrayKey);
 
-                        ArrayList<Race> raceList = new ArrayList<>();
+                        ArrayList<T> arrayList = new ArrayList<>();
                         for (int i = 0; i < count; i++) {
-                            Race race = gson.fromJson(racesArray.get(i), Race.class);
-                            raceList.add(race);
+                            T item = gson.fromJson(itemArray.get(i), clazz);
+                            arrayList.add(item);
                         }
-                        db.setRaces(raceList);
 
-                        // Return result on main thread
-                        new android.os.Handler(Looper.getMainLooper()).post(() -> callback.onDataLoaded(raceList));
+                        // Cache the data.
+                        functionSetter.accept(arrayList);
+
+                        // Return result on main thread. Main thread must deal with the data
+                        // as only the main thread can deal with the views it created.
+                        mainHandler.post(() -> callback.onDataLoaded(arrayList));
                     }
-
                     @Override
                     public void onError(String error) {
-                        callback.onError(error);
+                        System.out.println("API BodyCallBack Error: "+error);
                     }
                 });
             }
-
             @Override
             public void onError(Exception e) {
-                callback.onError(e.toString());
-            }
-        }, callback);
-    }
-
-
-    public void allEpicGamesApiAsync(DataStatus<EpicGame> callback) {
-        URL url;
-        try {
-            url = new URL("https://general-personal-app.onrender.com/api/epic_games");
-        } catch (Exception e) {
-            callback.onError(e.toString());
-            return;
-        }
-        getValidToken(new APICallback<String>() {
-            @Override
-            public void onSuccess(String usid) {
-                int maxRetries = 3;
-                fetchWithRetry(client, url, usid, maxRetries, new BodyCallBack() {
-                    @Override
-                    public void onSuccess(String body) {
-                        Gson gson = new Gson();
-                        JsonObject json = gson.fromJson(body, JsonObject.class);
-
-                        int count = json.get("count").getAsInt();
-                        JsonArray epicGamesArray = json.getAsJsonArray("epic_games");
-
-                        ArrayList<EpicGame> epicGamesList = new ArrayList<>();
-                        for (int i = 0; i < count; i++) {
-                            EpicGame game = gson.fromJson(epicGamesArray.get(i), EpicGame.class);
-                            epicGamesList.add(game);
-                        }
-                        db.setEpicGames(epicGamesList);
-
-                        // Return result on main thread
-                        new android.os.Handler(Looper.getMainLooper()).post(() -> callback.onDataLoaded(epicGamesList));
-                    }
-
-                    @Override
-                    public void onError(String error) {
-                        callback.onError(error);
-                    }
-                });
-            }
-
-            @Override
-            public void onError(Exception e) {
-                callback.onError(e.toString());
-            }
-        }, callback);
-    }
-
-
-    public void allFootballGamesApiAsync(DataStatus<Game> callback) {
-        URL url;
-        try {
-            url = new URL("https://general-personal-app.onrender.com/api/football");
-        } catch (Exception e) {
-            callback.onError(e.toString());
-            return;
-        }
-        getValidToken(new APICallback<String>() {
-            @Override
-            public void onSuccess(String usid) {
-                int maxRetries = 3;
-                fetchWithRetry(client, url, usid, maxRetries, new BodyCallBack() {
-                    @Override
-                    public void onSuccess(String body) {
-                        Gson gson = new Gson();
-                        JsonObject json = gson.fromJson(body, JsonObject.class);
-
-                        int count = json.get("count").getAsInt();
-                        JsonArray footballGamesArray = json.getAsJsonArray("football");
-
-                        ArrayList<Game> footballGamesList = new ArrayList<>();
-                        for (int i = 0; i < count; i++) {
-                            Game game = gson.fromJson(footballGamesArray.get(i), Game.class);
-                            footballGamesList.add(game);
-                        }
-                        db.setGames(footballGamesList);
-
-                        // Return result on main thread
-                        new android.os.Handler(Looper.getMainLooper()).post(() -> callback.onDataLoaded(footballGamesList));
-                    }
-
-                    @Override
-                    public void onError(String error) {
-                        callback.onError(error);
-                    }
-                });
-            }
-
-            @Override
-            public void onError(Exception e) {
-                callback.onError(e.toString());
+                System.out.println("API On Error: " + e);
             }
         }, callback);
     }

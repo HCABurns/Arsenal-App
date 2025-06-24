@@ -15,6 +15,7 @@ public interface DataStatus<T> {
      *
      * @param dataList - ArrayList containing Game objects.
      */
+
     void onDataLoaded(ArrayList<T> dataList);
 
     /**

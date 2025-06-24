@@ -7,23 +7,18 @@ import androidx.fragment.app.FragmentTransaction;
 import android.os.Bundle;
 
 import com.example.arsenal_app.R;
-import com.example.arsenal_app.database.API;
-import com.example.arsenal_app.database.DBHelper;
-import com.example.arsenal_app.database.DataStatus;
+import com.example.arsenal_app.database.DataRepository;
 import com.example.arsenal_app.fragments.EpicFragment;
 import com.example.arsenal_app.fragments.HomeFragment;
 import com.example.arsenal_app.fragments.FutureFragment;
 import com.example.arsenal_app.fragments.NextRaceFragment;
-import com.example.arsenal_app.models.Game;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.FirebaseApp;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import android.content.Intent;
-import android.view.View;
-
-import java.util.ArrayList;
+import android.widget.TextView;
 
 
 /**
@@ -33,9 +28,8 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity {
 
     // Required variables.
-    public static DBHelper db = new DBHelper();
-    public static API api = new API();
     private Fragment previousFragment = null;
+    private TextView title;
 
     /**
      * Executed on startup and sets the banner and navigation.
@@ -60,6 +54,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         // Initialize the Firebase app.
         FirebaseApp.initializeApp(this);
+
+        // Get the title bar and sets in data repo.
+        title = findViewById(R.id.pageTitle);
 
         // Create fragments that can be used for filling the fragment container.
         HomeFragment homeFragment = new HomeFragment();
@@ -86,21 +83,27 @@ public class MainActivity extends AppCompatActivity {
         bottomNavigationView.setOnItemSelectedListener(item -> {
             FragmentTransaction t = getSupportFragmentManager().beginTransaction();
             if (item.getItemId() == R.id.home_nav_bar) {
+                // Set new title.
+                title.setText((String)"Arsenal Information");
+                // Change Fragment.
                 t.hide(previousFragment).show(homeFragment).commit();
                 previousFragment = homeFragment;
                 return true;
             }
             else if (item.getItemId() == R.id.next_nav_bar) {
+                title.setText((String)"Future Arsenal Games");
                 t.hide(previousFragment).show(futureFragment).commit();
                 previousFragment = futureFragment;
                 return true;
             }
             else if (item.getItemId() == R.id.epic_game_nav_bar){
+                title.setText((String)"Free Epic Games");
                 t.hide(previousFragment).show(epicFragment).commit();
                 previousFragment = epicFragment;
                 return true;
             }
             else if (item.getItemId() == R.id.next_race_nav_bar){
+                title.setText((String)"F1 Information");
                 t.hide(previousFragment).show(nextRaceFragment).commit();
                 previousFragment = nextRaceFragment;
                 return true;
