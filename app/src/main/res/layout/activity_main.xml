@@ -9,7 +9,7 @@
     tools:context=".Activities.MainActivity">
 
     <TextView
-        android:id="@+id/addTextTest"
+        android:id="@+id/pageTitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="#000000"
@@ -37,7 +37,7 @@
         app:layout_constraintBottom_toTopOf="@+id/nav"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/addTextTest">
+        app:layout_constraintTop_toBottomOf="@+id/pageTitle">
 
     </FrameLayout>
 

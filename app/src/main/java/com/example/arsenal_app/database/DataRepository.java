@@ -69,10 +69,8 @@ public class DataRepository {
     public <T> void loadAllEpicGames(String url, String jsonArrayKey, Class<T> clazz,
                                      DataStatus<T> callback, Consumer<ArrayList<T>> functionSetter) {
         if (dbHelper.getEpicGames() != null && !dbHelper.getEpicGames().isEmpty()) {
-            System.out.println("EpicGames in DB");
             callback.onDataLoaded((ArrayList<T>) dbHelper.getEpicGames());
         } else {
-            System.out.println("Fetching EpicGames from API");
             api.fetchData(url, jsonArrayKey, clazz, callback, functionSetter);
         }
     }
@@ -99,7 +97,6 @@ public class DataRepository {
 
         // If already fetching this data, queue the callback
         if (Boolean.TRUE.equals(isFetchingMap.get(url))) {
-            System.out.println("FUNCTION ALREADY RUNNING - Waiting FOR COMPLETE!");
             List<DataStatus<?>> waitingList = waitingCallbacksMap.get(url);
             if (waitingList == null) {
                 waitingList = new ArrayList<>();
