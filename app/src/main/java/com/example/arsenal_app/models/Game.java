@@ -109,11 +109,4 @@ public class Game {
                 ", badge_base64='" + badge_base64 + '\'' +
                 '}';
     }
-
-    public static void main(String[] args) {
-        Game game = new Game();
-        game.stadium = "awd";
-        System.out.println(game);
-    }
-
 }

@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 
 import androidx.fragment.app.Fragment;
@@ -34,7 +33,9 @@ public class EpicFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_epic, container, false);
         ProgressBar progressBar = view.findViewById(R.id.epic_game_progress_bar);
         RecyclerView recyclerView = view.findViewById(R.id.epic_games_recycler);
-        DataRepository.getInstance().loadAllEpicGames(new DataStatus<EpicGame>() {
+        DataRepository.getInstance().loadAllEpicGames(
+                "https://general-personal-app.onrender.com/api/epic_games",
+                "epic_games" , EpicGame.class, new DataStatus<EpicGame>() {
             @Override
             public void onDataLoaded(ArrayList<EpicGame> dataList) {
                 progressBar.setVisibility(View.GONE);
@@ -49,7 +50,7 @@ public class EpicFragment extends Fragment {
             public void onError(String errorMessage) {
                 System.out.println("ERROR " + errorMessage);
             }
-        });
+        }, DataRepository.getInstance().getDbHelper()::setEpicGames);
         return view;
     }
 }

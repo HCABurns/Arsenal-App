@@ -14,6 +14,7 @@ import com.example.arsenal_app.Adapters.FutureAdapter;
 import com.example.arsenal_app.R;
 import com.example.arsenal_app.database.DataRepository;
 import com.example.arsenal_app.database.DataStatus;
+import com.example.arsenal_app.models.EpicGame;
 import com.example.arsenal_app.models.Game;
 
 import java.util.ArrayList;
@@ -36,7 +37,9 @@ public class FutureFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_future, container, false);
-        DataRepository.getInstance().loadAllFootballGames(new DataStatus<Game>() {
+        DataRepository.getInstance().loadAllFootballGames(
+        "https://general-personal-app.onrender.com/api/football",
+                "football" , Game.class,new DataStatus<Game>() {
             @Override
             public void onDataLoaded(ArrayList<Game> dataList) {
                 DataRepository.getInstance().getDbHelper().setGames(dataList);
@@ -51,7 +54,7 @@ public class FutureFragment extends Fragment {
             public void onError(String errorMessage) {
 
             }
-        });
+        }, DataRepository.getInstance().getDbHelper()::setGames);
         return view;
     }
 }

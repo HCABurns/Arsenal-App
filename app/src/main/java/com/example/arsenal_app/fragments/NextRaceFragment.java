@@ -19,6 +19,7 @@ import com.example.arsenal_app.R;
 import com.example.arsenal_app.database.API;
 import com.example.arsenal_app.database.DataRepository;
 import com.example.arsenal_app.database.DataStatus;
+import com.example.arsenal_app.models.Game;
 import com.example.arsenal_app.models.Race;
 
 import java.text.MessageFormat;
@@ -45,7 +46,9 @@ public class NextRaceFragment extends Fragment {
         TextView circuitView = view.findViewById(R.id.next_race_circuit);
 
         // Load the data into the page via API call.
-        DataRepository.getInstance().loadAllRaces(new DataStatus<Race>() {
+        DataRepository.getInstance().loadAllRaces(
+                "https://general-personal-app.onrender.com/api/f1",
+                "races" , Race.class, new DataStatus<Race>() {
             @Override
             public void onDataLoaded(ArrayList<Race> races) {
                 // Sort based on closest to today.
@@ -139,7 +142,7 @@ public class NextRaceFragment extends Fragment {
             public void onError(String e) {
                 System.out.println("Error on retrieval of the races: " + e);
             }
-        });
+        }, DataRepository.getInstance().getDbHelper()::setRaces);
         return view;
     }
 }

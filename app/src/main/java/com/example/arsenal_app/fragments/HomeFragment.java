@@ -61,7 +61,9 @@ public class HomeFragment extends Fragment {
 
         // Load the data into the page.
 
-        DataRepository.getInstance().loadAllFootballGames(new DataStatus<Game>() {
+        DataRepository.getInstance().loadAllFootballGames(
+                "https://general-personal-app.onrender.com/api/football",
+                "football" , Game.class,new DataStatus<Game>() {
             @Override
             public void onDataLoaded(ArrayList<Game> dataList) {
                 progressBar.setVisibility(View.GONE);
@@ -154,7 +156,7 @@ public class HomeFragment extends Fragment {
             public void onError(String errorMessage) {
                 System.out.println("HomePage Loading error: " + errorMessage);
             }
-        });
+        }, DataRepository.getInstance().getDbHelper()::setGames);
         return view;
     }
 }

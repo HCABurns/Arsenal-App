@@ -3,14 +3,11 @@ package com.example.arsenal_app.database;
 // Imports.
 import android.os.Looper;
 
-import com.example.arsenal_app.models.EpicGame;
-import com.example.arsenal_app.models.Game;
-import com.example.arsenal_app.models.Race;
-
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 import okhttp3.Call;
 import okhttp3.OkHttpClient;
@@ -34,6 +31,10 @@ public class API {
             .readTimeout(90, TimeUnit.SECONDS)
             .writeTimeout(60, TimeUnit.SECONDS)
             .build();
+
+    private final android.os.Handler mainHandler = new android.os.Handler(Looper.getMainLooper());
+
+
 
     /**
      * Function to ensure the user has a valid token before an API call.
@@ -68,7 +69,7 @@ public class API {
 
         client.newCall(request).enqueue(new okhttp3.Callback() {
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
+            public void onResponse(Call call, Response response){
                 try (ResponseBody responseBody = response.body()) {
                     if (!response.isSuccessful()) {
                         callback.onError(("Unexpected code " + response.code()));
@@ -97,142 +98,50 @@ public class API {
         });
     }
 
-    public void allRacesApiAsync(DataStatus<Race> callback) {
-        URL url;
+    public <T> void fetchData(String urlString,
+                              String jsonArrayKey,
+                              Class<T> clazz,
+                              DataStatus<T> callback,
+                              Consumer<ArrayList<T>> functionSetter) {
+        URL url = null;
         try {
-            url = new URL("https://general-personal-app.onrender.com/api/f1");
+            url = new URL(urlString);
         } catch (Exception e) {
             callback.onError(e.toString());
-            return;
         }
+        URL finalUrl = url;
         getValidToken(new APICallback<String>() {
             @Override
             public void onSuccess(String usid) {
                 int maxRetries = 3;
-                fetchWithRetry(client, url, usid, maxRetries, new BodyCallBack() {
+                fetchWithRetry(client, finalUrl, usid, maxRetries, new BodyCallBack() {
                     @Override
                     public void onSuccess(String body) {
                         Gson gson = new Gson();
                         JsonObject json = gson.fromJson(body, JsonObject.class);
 
                         int count = json.get("count").getAsInt();
-                        JsonArray racesArray = json.getAsJsonArray("races");
+                        JsonArray itemArray = json.getAsJsonArray(jsonArrayKey);
 
-                        ArrayList<Race> raceList = new ArrayList<>();
+                        ArrayList<T> arrayList = new ArrayList<>();
                         for (int i = 0; i < count; i++) {
-                            Race race = gson.fromJson(racesArray.get(i), Race.class);
-                            raceList.add(race);
+                            T item = gson.fromJson(itemArray.get(i), clazz);
+                            arrayList.add(item);
                         }
-                        DataRepository.getInstance().getDbHelper().setRaces(raceList);
+                        functionSetter.accept(arrayList);
 
                         // Return result on main thread
-                        new android.os.Handler(Looper.getMainLooper()).post(() -> callback.onDataLoaded(raceList));
+                        mainHandler.post(() -> callback.onDataLoaded(arrayList));
                     }
-
                     @Override
                     public void onError(String error) {
-                        callback.onError(error);
+
                     }
                 });
             }
-
             @Override
             public void onError(Exception e) {
-                callback.onError(e.toString());
-            }
-        }, callback);
-    }
 
-
-    public void allEpicGamesApiAsync(DataStatus<EpicGame> callback) {
-        URL url;
-        try {
-            url = new URL("https://general-personal-app.onrender.com/api/epic_games");
-        } catch (Exception e) {
-            callback.onError(e.toString());
-            return;
-        }
-        getValidToken(new APICallback<String>() {
-            @Override
-            public void onSuccess(String usid) {
-                int maxRetries = 3;
-                fetchWithRetry(client, url, usid, maxRetries, new BodyCallBack() {
-                    @Override
-                    public void onSuccess(String body) {
-                        Gson gson = new Gson();
-                        JsonObject json = gson.fromJson(body, JsonObject.class);
-
-                        int count = json.get("count").getAsInt();
-                        JsonArray epicGamesArray = json.getAsJsonArray("epic_games");
-
-                        ArrayList<EpicGame> epicGamesList = new ArrayList<>();
-                        for (int i = 0; i < count; i++) {
-                            EpicGame game = gson.fromJson(epicGamesArray.get(i), EpicGame.class);
-                            epicGamesList.add(game);
-                        }
-                        DataRepository.getInstance().getDbHelper().setEpicGames(epicGamesList);
-
-                        // Return result on main thread
-                        new android.os.Handler(Looper.getMainLooper()).post(() -> callback.onDataLoaded(epicGamesList));
-                    }
-
-                    @Override
-                    public void onError(String error) {
-                        callback.onError(error);
-                    }
-                });
-            }
-
-            @Override
-            public void onError(Exception e) {
-                callback.onError(e.toString());
-            }
-        }, callback);
-    }
-
-
-    public void allFootballGamesApiAsync(DataStatus<Game> callback) {
-        URL url;
-        try {
-            url = new URL("https://general-personal-app.onrender.com/api/football");
-        } catch (Exception e) {
-            callback.onError(e.toString());
-            return;
-        }
-        getValidToken(new APICallback<String>() {
-            @Override
-            public void onSuccess(String usid) {
-                int maxRetries = 3;
-                fetchWithRetry(client, url, usid, maxRetries, new BodyCallBack() {
-                    @Override
-                    public void onSuccess(String body) {
-                        Gson gson = new Gson();
-                        JsonObject json = gson.fromJson(body, JsonObject.class);
-
-                        int count = json.get("count").getAsInt();
-                        JsonArray footballGamesArray = json.getAsJsonArray("football");
-
-                        ArrayList<Game> footballGamesList = new ArrayList<>();
-                        for (int i = 0; i < count; i++) {
-                            Game game = gson.fromJson(footballGamesArray.get(i), Game.class);
-                            footballGamesList.add(game);
-                        }
-                        DataRepository.getInstance().getDbHelper().setGames(footballGamesList);
-
-                        // Return result on main thread
-                        new android.os.Handler(Looper.getMainLooper()).post(() -> callback.onDataLoaded(footballGamesList));
-                    }
-
-                    @Override
-                    public void onError(String error) {
-                        callback.onError(error);
-                    }
-                });
-            }
-
-            @Override
-            public void onError(Exception e) {
-                callback.onError(e.toString());
             }
         }, callback);
     }

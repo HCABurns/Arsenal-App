@@ -1,5 +1,7 @@
 package com.example.arsenal_app.database;
 
+import com.example.arsenal_app.models.EpicGame;
+
 import java.util.ArrayList;
 
 /**
@@ -15,6 +17,7 @@ public interface DataStatus<T> {
      *
      * @param dataList - ArrayList containing Game objects.
      */
+
     void onDataLoaded(ArrayList<T> dataList);
 
     /**

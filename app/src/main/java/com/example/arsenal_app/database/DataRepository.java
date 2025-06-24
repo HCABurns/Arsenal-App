@@ -1,8 +1,10 @@
 package com.example.arsenal_app.database;
 
-import com.example.arsenal_app.models.EpicGame;
 import com.example.arsenal_app.models.Game;
 import com.example.arsenal_app.models.Race;
+
+import java.util.ArrayList;
+import java.util.function.Consumer;
 
 public class DataRepository {
 
@@ -30,27 +32,27 @@ public class DataRepository {
         return api;
     }
 
-    public void loadAllEpicGames(DataStatus<EpicGame> callback) {
-        if (dbHelper.getGames() != null && !dbHelper.getEpicGames().isEmpty()) {
-            callback.onDataLoaded(dbHelper.getEpicGames());
+    public <T> void loadAllEpicGames(String urlString,String jsonArrayKey, Class<T> clazz, DataStatus<T> callback, Consumer<ArrayList<T>> functionSetter) {
+        if (dbHelper.getEpicGames() != null && !dbHelper.getEpicGames().isEmpty()) {
+            callback.onDataLoaded((ArrayList<T>) DataRepository.getInstance().getDbHelper().getEpicGames());
         } else {
-            api.allEpicGamesApiAsync(callback);
+            api.fetchData(urlString, jsonArrayKey, clazz, callback, functionSetter);
         }
     }
 
-    public void loadAllFootballGames(DataStatus<Game> callback) {
-        if (dbHelper.getGames() != null && !dbHelper.getEpicGames().isEmpty()) {
-            callback.onDataLoaded(dbHelper.getGames());
+    public <T> void loadAllFootballGames(String urlString,String jsonArrayKey, Class<T> clazz, DataStatus<T> callback, Consumer<ArrayList<T>> functionSetter) {
+        if (dbHelper.getGames() != null && !dbHelper.getGames().isEmpty()) {
+            callback.onDataLoaded((ArrayList<T>) DataRepository.getInstance().getDbHelper().getGames());
         } else {
-            api.allFootballGamesApiAsync(callback);
+            api.fetchData(urlString, jsonArrayKey, clazz, callback, functionSetter);
         }
     }
 
-    public void loadAllRaces(DataStatus<Race> callback) {
-        if (dbHelper.getGames() != null && !dbHelper.getEpicGames().isEmpty()) {
-            callback.onDataLoaded(dbHelper.getRaces());
+    public <T> void loadAllRaces(String urlString,String jsonArrayKey, Class<T> clazz, DataStatus<T> callback, Consumer<ArrayList<T>> functionSetter) {
+        if (dbHelper.getRaces() != null && !dbHelper.getRaces().isEmpty()) {
+            callback.onDataLoaded((ArrayList<T>) DataRepository.getInstance().getDbHelper().getRaces());
         } else {
-            api.allRacesApiAsync(callback);
+            api.fetchData(urlString, jsonArrayKey, clazz, callback, functionSetter);
         }
     }
 }
