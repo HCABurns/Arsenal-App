@@ -6,6 +6,7 @@ import android.os.Looper;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
@@ -26,65 +27,88 @@ import com.google.gson.JsonArray;
  */
 public class API {
 
+    // List to store all callbacks while waiting for token retrieval.
+    private final List<APICallback<String>> tokenCallbacksHolder = new ArrayList<>();
+    // Flag to indicate if the token is being fetched.
+    private boolean isFetchingToken = false;
+    // Client object to perform HTTP requests to the API server.
     private final OkHttpClient client = new OkHttpClient.Builder()
-            .connectTimeout(3, TimeUnit.SECONDS)
-            .readTimeout(3, TimeUnit.SECONDS)
+            .connectTimeout(60, TimeUnit.SECONDS)
+            .readTimeout(90, TimeUnit.SECONDS)
             .writeTimeout(0, TimeUnit.SECONDS)
             .build();
-
+    // Handler object to allow for return on the main thread.
     private final android.os.Handler mainHandler = new android.os.Handler(Looper.getMainLooper());
 
 
-
     /**
-     * Function to ensure the user has a valid token before an API call.
+     * Function to ensure the user has a valid token before an API call. Uses a list of callback
+     * objects to ensure only one instance tries to access the token and improving efficiency.
      *
-     * @param apiCallback
+     * @param apiCallback Interface implementation to be used upon successful retrieval of the
+     *                    users token.
      * @param dataStatus  Interface implementation to be used as a callback in the event of an
      *                    error to verify the users token.
-     * @param <T>
+     * @param <T> Class type of the data that is requested.
      */
     public <T> void getValidToken(APICallback<String> apiCallback, DataStatus<T> dataStatus) {
-        System.out.println("getToken callled");
+
+        // If the userID is already
         if (DataRepository.getInstance().getDbHelper().get_usid() == null) {
-            System.out.println("No token cached, fetching from firebase");
+            // Check if the token is already being retrieved. - Add to holder if true otherwise
+            // set flag and run the code to get the token.
+            if (isFetchingToken){
+                tokenCallbacksHolder.add(apiCallback);
+                return;
+            }
+            isFetchingToken = true;
             FirebaseAuth.getInstance().getCurrentUser().getIdToken(true)
                     .addOnCompleteListener(task -> {
-                        System.out.println("Firebase task complete");
+                        // Upon token being retrieved, store and return via callback(s).
                         if (task.isSuccessful()) {
-                            System.out.println("VALID TOKEN!");
                             String idToken = task.getResult().getToken();
                             DataRepository.getInstance().getDbHelper().set_usid(idToken);
 
+                            for (APICallback<String> apiCallback1 : tokenCallbacksHolder){
+                                apiCallback1.onSuccess(idToken);
+                            }
                             apiCallback.onSuccess(idToken);
+                            isFetchingToken = false;
                         } else {
                             dataStatus.onError("Failure to verify user.");
                         }
                     });
         } else {
-            System.out.println("Using cached token");
+            // Return the already cached token.
             apiCallback.onSuccess(DataRepository.getInstance().getDbHelper().get_usid());
         }
     }
 
-    private void fetchWithRetry(OkHttpClient client, URL url, String token, int retriesLeft, BodyCallBack callback) {
+    /**
+     * This function will connect to the URL and attempt to retrieve data.
+     *
+     * @param url The API url to be connected to.
+     * @param token The users token to be sent as a header to the API for authenticated.
+     * @param retriesLeft Integer of the number of retries left upon
+     * @param callback Callback object to return the data from the URL.
+     */
+    private void fetchWithRetry(URL url, String token, int retriesLeft, BodyCallBack callback) {
+        // Create the request.
         Request request = new Request.Builder()
                 .url(url)
                 .addHeader("Authorization", "Bearer " + token)
                 .build();
 
+        // Create a call to the URL and retrieve the data and return via callback.
         client.newCall(request).enqueue(new okhttp3.Callback() {
             @Override
             public void onResponse(Call call, Response response){
-                System.out.println("OnResponse Successful");
                 try (ResponseBody responseBody = response.body()) {
                     if (!response.isSuccessful()) {
                         callback.onError(("Unexpected code " + response.code()));
                         return;
                     }
-
                     String body = responseBody.string();
-                    System.out.println("BODY Received");
                     callback.onSuccess(body);
 
                 } catch (Exception e) {
@@ -96,9 +120,9 @@ public class API {
             public void onFailure(Call call, IOException e) {
                 if (retriesLeft > 1) {
                     System.out.println("Attempt failed: " + e.getMessage() + ". Retrying...");
-                    // Try again after delay
+                    // Try again after delay.
                     new android.os.Handler(Looper.getMainLooper()).postDelayed(() ->
-                            fetchWithRetry(client, url, token, retriesLeft - 1, callback), 2000);
+                            fetchWithRetry(url, token, retriesLeft - 1, callback), 2000);
                 } else {
                     callback.onError("Fetch with retry error: " + e);
                 }
@@ -106,31 +130,42 @@ public class API {
         });
     }
 
-    public <T> void fetchData(String endPoint,
+    /**
+     * Function will connect to the url and retrieve the json data from the API and return it as
+     * an ArrayList of Objects of type <T>.
+     *
+     * @param APIUrl URL of the API.
+     * @param jsonArrayKey Key of the information.
+     * @param clazz This is the class relating to the object to be created with the data.
+     * @param callback Callback object to return the arrayList once the data has been read.
+     * @param functionSetter Consumer object of the function that will cache the data once it
+     *                       has been read.
+     * @param <T> Type of the object.
+     */
+    public <T> void fetchData(String APIUrl,
                               String jsonArrayKey,
                               Class<T> clazz,
                               DataStatus<T> callback,
                               Consumer<ArrayList<T>> functionSetter) {
+        // Get URL object.
         URL url = null;
         try {
-            StringBuilder sb = new StringBuilder();
-            sb.append("https://general-personal-app.onrender.com/api/");
-            sb.append(endPoint);
-            url = new URL(sb.toString());
+            url = new URL(APIUrl);
         } catch (Exception e) {
             callback.onError(e.toString());
         }
         URL finalUrl = url;
-        System.out.println(url.toString());
+
+        // Get the token of the user.
         getValidToken(new APICallback<String>() {
             @Override
             public void onSuccess(String usid) {
-                int maxRetries = 1;
-                System.out.println("Token received: Starting fetchWithRetry");
-                fetchWithRetry(client, finalUrl, usid, maxRetries, new BodyCallBack() {
+                int maxRetries = 2;
+                // Fetch the information from the URL.
+                fetchWithRetry(finalUrl, usid, maxRetries, new BodyCallBack() {
                     @Override
                     public void onSuccess(String body) {
-                        System.out.println("API Call successful!");
+                        // Set information to be an ArrayList of objects of clazz.
                         Gson gson = new Gson();
                         JsonObject json = gson.fromJson(body, JsonObject.class);
 
@@ -142,9 +177,12 @@ public class API {
                             T item = gson.fromJson(itemArray.get(i), clazz);
                             arrayList.add(item);
                         }
+
+                        // Cache the data.
                         functionSetter.accept(arrayList);
 
-                        // Return result on main thread
+                        // Return result on main thread. Main thread must deal with the data
+                        // as only the main thread can deal with the views it created.
                         mainHandler.post(() -> callback.onDataLoaded(arrayList));
                     }
                     @Override
