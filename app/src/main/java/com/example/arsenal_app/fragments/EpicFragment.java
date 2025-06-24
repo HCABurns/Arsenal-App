@@ -34,7 +34,7 @@ public class EpicFragment extends Fragment {
         ProgressBar progressBar = view.findViewById(R.id.epic_game_progress_bar);
         RecyclerView recyclerView = view.findViewById(R.id.epic_games_recycler);
         DataRepository.getInstance().loadAllEpicGames(
-                "https://general-personal-app.onrender.com/api/epic_games",
+                "epic_games",
                 "epic_games" , EpicGame.class, new DataStatus<EpicGame>() {
             @Override
             public void onDataLoaded(ArrayList<EpicGame> dataList) {

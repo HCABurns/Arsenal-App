@@ -62,7 +62,7 @@ public class HomeFragment extends Fragment {
         // Load the data into the page.
 
         DataRepository.getInstance().loadAllFootballGames(
-                "https://general-personal-app.onrender.com/api/football",
+                "football",
                 "football" , Game.class,new DataStatus<Game>() {
             @Override
             public void onDataLoaded(ArrayList<Game> dataList) {

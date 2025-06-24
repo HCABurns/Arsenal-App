@@ -1,7 +1,5 @@
 package com.example.arsenal_app.database;
 
-import com.example.arsenal_app.models.EpicGame;
-
 import java.util.ArrayList;
 
 /**

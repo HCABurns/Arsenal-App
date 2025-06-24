@@ -47,7 +47,7 @@ public class NextRaceFragment extends Fragment {
 
         // Load the data into the page via API call.
         DataRepository.getInstance().loadAllRaces(
-                "https://general-personal-app.onrender.com/api/f1",
+                "f1",
                 "races" , Race.class, new DataStatus<Race>() {
             @Override
             public void onDataLoaded(ArrayList<Race> races) {

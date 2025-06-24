@@ -32,27 +32,29 @@ public class DataRepository {
         return api;
     }
 
-    public <T> void loadAllEpicGames(String urlString,String jsonArrayKey, Class<T> clazz, DataStatus<T> callback, Consumer<ArrayList<T>> functionSetter) {
+    public <T> void loadAllEpicGames(String endPoint,String jsonArrayKey, Class<T> clazz, DataStatus<T> callback, Consumer<ArrayList<T>> functionSetter) {
         if (dbHelper.getEpicGames() != null && !dbHelper.getEpicGames().isEmpty()) {
+            System.out.println("EpicGames in DB");
             callback.onDataLoaded((ArrayList<T>) DataRepository.getInstance().getDbHelper().getEpicGames());
         } else {
-            api.fetchData(urlString, jsonArrayKey, clazz, callback, functionSetter);
+            System.out.println("Fetching EpicGames from DB: ");
+            api.fetchData(endPoint, jsonArrayKey, clazz, callback, functionSetter);
         }
     }
 
-    public <T> void loadAllFootballGames(String urlString,String jsonArrayKey, Class<T> clazz, DataStatus<T> callback, Consumer<ArrayList<T>> functionSetter) {
+    public <T> void loadAllFootballGames(String endPoint,String jsonArrayKey, Class<T> clazz, DataStatus<T> callback, Consumer<ArrayList<T>> functionSetter) {
         if (dbHelper.getGames() != null && !dbHelper.getGames().isEmpty()) {
             callback.onDataLoaded((ArrayList<T>) DataRepository.getInstance().getDbHelper().getGames());
         } else {
-            api.fetchData(urlString, jsonArrayKey, clazz, callback, functionSetter);
+            api.fetchData(endPoint, jsonArrayKey, clazz, callback, functionSetter);
         }
     }
 
-    public <T> void loadAllRaces(String urlString,String jsonArrayKey, Class<T> clazz, DataStatus<T> callback, Consumer<ArrayList<T>> functionSetter) {
+    public <T> void loadAllRaces(String endPoint,String jsonArrayKey, Class<T> clazz, DataStatus<T> callback, Consumer<ArrayList<T>> functionSetter) {
         if (dbHelper.getRaces() != null && !dbHelper.getRaces().isEmpty()) {
             callback.onDataLoaded((ArrayList<T>) DataRepository.getInstance().getDbHelper().getRaces());
         } else {
-            api.fetchData(urlString, jsonArrayKey, clazz, callback, functionSetter);
+            api.fetchData(endPoint, jsonArrayKey, clazz, callback, functionSetter);
         }
     }
 }
