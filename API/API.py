@@ -24,6 +24,8 @@ def get_data(ref):
         list: Return a list of dicts of requested data.
     """
     info = db.reference(ref).get()
+    if type(info) == dict:
+        return info
     info_with_ids = []
     for id, data in enumerate(info):
         info_with_id = data
@@ -151,6 +153,31 @@ def get_country_races(country_name):
     return {"races":results,"count":len(results)}, 200
 
 
+@app.route('/api/football/<string:team>', methods=['GET'])
+def get_team_games(team):
+    """
+    Get all football games information for a given team.
+
+    Verifies the Firebase token and returns race data in JSON format
+    if the user is authenticated.
+
+    Inputs:
+        str: String of the team name.
+
+    Returns:
+        tuple: A tuple containing:
+            - dict: JSON response with football game data or error message.
+            - int: HTTP status code.
+    """
+    uid, error_response, status = verify_firebase_token()
+    if not uid:
+        return error_response, status
+    if team in football_games:
+        return {"football":football_games[team],"count":len(football_games[team])}, 200
+    else:
+        jsonify({'error': 'No team found'}), 404
+
+
 @app.route('/api/football', methods=['GET'])
 def get_games():
     """
@@ -168,25 +195,6 @@ def get_games():
     if not uid:
         return error_response, status
     return {"football":football_games,"count":len(football_games)}, 200
-
-
-@app.route('/api/football/<string:team>', methods=['GET'])
-def get_team_games():
-    """
-    Get all football games information.
-
-    Verifies the Firebase token and returns race data in JSON format
-    if the user is authenticated.
-
-    Returns:
-        tuple: A tuple containing:
-            - dict: JSON response with football game data or error message.
-            - int: HTTP status code.
-    """
-    uid, error_response, status = verify_firebase_token()
-    if not uid:
-        return error_response, status
-    return {"football":football_games[team],"count":len(football_games)}, 200
 
 
 
