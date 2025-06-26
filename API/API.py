@@ -170,6 +170,26 @@ def get_games():
     return {"football":football_games,"count":len(football_games)}, 200
 
 
+@app.route('/api/football/<string:team>', methods=['GET'])
+def get_team_games():
+    """
+    Get all football games information.
+
+    Verifies the Firebase token and returns race data in JSON format
+    if the user is authenticated.
+
+    Returns:
+        tuple: A tuple containing:
+            - dict: JSON response with football game data or error message.
+            - int: HTTP status code.
+    """
+    uid, error_response, status = verify_firebase_token()
+    if not uid:
+        return error_response, status
+    return {"football":football_games[team],"count":len(football_games)}, 200
+
+
+
 @app.route('/api/epic_games', methods=['GET'])
 def get_epic_games():
     """

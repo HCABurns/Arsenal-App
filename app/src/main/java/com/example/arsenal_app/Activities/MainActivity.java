@@ -3,7 +3,9 @@ package com.example.arsenal_app.Activities;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.preference.PreferenceManager;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import com.example.arsenal_app.R;
@@ -18,6 +20,8 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import android.content.Intent;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 
@@ -55,6 +59,8 @@ public class MainActivity extends AppCompatActivity {
         // Initialize the Firebase app.
         FirebaseApp.initializeApp(this);
 
+        DataRepository.getInstance().setPrefs(PreferenceManager.getDefaultSharedPreferences(this));
+
         // Get the title bar and sets in data repo.
         title = findViewById(R.id.pageTitle);
 
@@ -84,14 +90,14 @@ public class MainActivity extends AppCompatActivity {
             FragmentTransaction t = getSupportFragmentManager().beginTransaction();
             if (item.getItemId() == R.id.home_nav_bar) {
                 // Set new title.
-                title.setText((String)"Arsenal Information");
+                title.setText((String)"Next Game Information");
                 // Change Fragment.
                 t.hide(previousFragment).show(homeFragment).commit();
                 previousFragment = homeFragment;
                 return true;
             }
             else if (item.getItemId() == R.id.next_nav_bar) {
-                title.setText((String)"Future Arsenal Games");
+                title.setText((String)"Future Games");
                 t.hide(previousFragment).show(futureFragment).commit();
                 previousFragment = futureFragment;
                 return true;
@@ -112,5 +118,13 @@ public class MainActivity extends AppCompatActivity {
                 return false;
             }
         });
+
+        Button settingsButton = findViewById(R.id.settings_button);
+        settingsButton.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+            startActivity(intent);
+        });
+
+
     }
 }

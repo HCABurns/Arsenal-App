@@ -11,8 +11,10 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import com.example.arsenal_app.Activities.MainActivity;
 import com.example.arsenal_app.R;
 import com.example.arsenal_app.database.DataRepository;
 import com.example.arsenal_app.database.DataStatus;
@@ -58,11 +60,12 @@ public class HomeFragment extends Fragment {
         stadiumView = view.findViewById(R.id.next_match_stadium);
         countdownView = view.findViewById(R.id.next_match_countdown);
         opponentBadgeView = view.findViewById(R.id.next_opponent_opponentBadge);
-
         // Load the data into the page.
 
+        competitionView.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.skeleton));
+
         DataRepository.getInstance().loadAllFootballGames(
-                "https://general-personal-app.onrender.com/api/football",
+                "https://general-personal-app.onrender.com/api/football/"+DataRepository.getInstance().getTeam(),
                 "football" , Game.class,new DataStatus<Game>() {
             @Override
             public void onDataLoaded(ArrayList<Game> dataList) {

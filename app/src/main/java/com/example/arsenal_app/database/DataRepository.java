@@ -1,12 +1,23 @@
 package com.example.arsenal_app.database;
 
+import static java.security.AccessController.getContext;
+
+import android.content.SharedPreferences;
+
+import androidx.core.content.ContextCompat;
+import androidx.preference.PreferenceManager;
+
+import com.example.arsenal_app.Activities.MainActivity;
 import com.example.arsenal_app.models.Game;
 
+import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+
+import javax.security.auth.Subject;
 
 /**
  * Singleton class responsible for coordinating data access and storage.
@@ -30,6 +41,12 @@ public class DataRepository {
     // Stores waiting callbacks for endpoints that are already being fetched.
     Map<String, List<DataStatus<?>>> waitingCallbacksMap = new HashMap<>();
 
+    // Get preferences:
+    private SharedPreferences prefs;
+
+    // Example: get a String preference
+    String myTeam = prefs.getString("default_team", "default_value");
+
     /**
      * Private constructor to create dbHelper and API.
      */
@@ -47,6 +64,14 @@ public class DataRepository {
             instance = new DataRepository();
         }
         return instance;
+    }
+
+    public void setPrefs(SharedPreferences prefs){
+        this.prefs = prefs;
+    }
+
+    public String getTeam(){
+        return this.myTeam;
     }
 
     public DBHelper getDbHelper() {
@@ -88,7 +113,6 @@ public class DataRepository {
     public <T> void loadAllFootballGames(String url, String jsonArrayKey, Class<T> clazz,
                                          DataStatus<T> callback, Consumer<ArrayList<T>> functionSetter) {
         ArrayList<Game> cached = dbHelper.getGames();
-
         // If data is cached, return it immediately
         if (cached != null && !cached.isEmpty()) {
             callback.onDataLoaded((ArrayList<T>) cached);
