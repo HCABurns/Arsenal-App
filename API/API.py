@@ -24,6 +24,8 @@ def get_data(ref):
         list: Return a list of dicts of requested data.
     """
     info = db.reference(ref).get()
+    if type(info) == dict:
+        return info
     info_with_ids = []
     for id, data in enumerate(info):
         info_with_id = data
@@ -61,10 +63,11 @@ def initialize_firebase():
         races = get_data("f1")
         football_games = get_data("games")
         epic_games = get_data("epic_games")
-        return races, football_games, epic_games
+        logos = get_data("logos")
+        return races, football_games, epic_games, logos
     except Exception as e:
         print(f"Error occurred during Firebase initialization: {e}")
-        return [],[],[]
+        return [],[],[],[]
 
 
 def verify_firebase_token():
@@ -151,6 +154,31 @@ def get_country_races(country_name):
     return {"races":results,"count":len(results)}, 200
 
 
+@app.route('/api/football/<string:team>', methods=['GET'])
+def get_team_games(team):
+    """
+    Get all football games information for a given team.
+
+    Verifies the Firebase token and returns race data in JSON format
+    if the user is authenticated.
+
+    Inputs:
+        str: String of the team name.
+
+    Returns:
+        tuple: A tuple containing:
+            - dict: JSON response with football game data or error message.
+            - int: HTTP status code.
+    """
+    uid, error_response, status = verify_firebase_token()
+    if not uid:
+        return error_response, status
+    if team in football_games:
+        return {"football":football_games[team],"count":len(football_games[team]), "team_base64":logos[team]}, 200
+    else:
+        jsonify({'error': 'No team found'}), 404
+
+
 @app.route('/api/football', methods=['GET'])
 def get_games():
     """
@@ -168,6 +196,7 @@ def get_games():
     if not uid:
         return error_response, status
     return {"football":football_games,"count":len(football_games)}, 200
+
 
 
 @app.route('/api/epic_games', methods=['GET'])
@@ -204,6 +233,6 @@ def page_not_found(e):
     return jsonify({'error': 'Unknown Request'}), 404
 
 # Get data from the database.
-races, football_games, epic_games = initialize_firebase()
+races, football_games, epic_games, logos = initialize_firebase()
 if __name__ == "__main__":
     app.run()

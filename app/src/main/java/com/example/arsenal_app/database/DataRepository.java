@@ -1,5 +1,6 @@
 package com.example.arsenal_app.database;
 
+import com.example.arsenal_app.Activities.MainActivity;
 import com.example.arsenal_app.models.Game;
 
 import java.util.ArrayList;
@@ -7,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+
 
 /**
  * Singleton class responsible for coordinating data access and storage.
@@ -30,12 +32,16 @@ public class DataRepository {
     // Stores waiting callbacks for endpoints that are already being fetched.
     Map<String, List<DataStatus<?>>> waitingCallbacksMap = new HashMap<>();
 
+    // Get preferences:
+    private final SettingsManager settingsManager;
+
     /**
      * Private constructor to create dbHelper and API.
      */
     private DataRepository() {
         dbHelper = new DBHelper();
         api = new API();
+        settingsManager = new SettingsManager();
     }
 
     /**
@@ -56,6 +62,8 @@ public class DataRepository {
     public API getApi() {
         return api;
     }
+
+    public SettingsManager getSettingsManager(){return settingsManager;}
 
     /**
      * Loads EpicGames data, either from local cache or by making an API call.
@@ -88,7 +96,6 @@ public class DataRepository {
     public <T> void loadAllFootballGames(String url, String jsonArrayKey, Class<T> clazz,
                                          DataStatus<T> callback, Consumer<ArrayList<T>> functionSetter) {
         ArrayList<Game> cached = dbHelper.getGames();
-
         // If data is cached, return it immediately
         if (cached != null && !cached.isEmpty()) {
             callback.onDataLoaded((ArrayList<T>) cached);

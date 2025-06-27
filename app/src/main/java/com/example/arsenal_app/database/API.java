@@ -169,6 +169,11 @@ public class API {
                         Gson gson = new Gson();
                         JsonObject json = gson.fromJson(body, JsonObject.class);
 
+                        if (finalUrl.toString().contains("/football/")){
+                            DataRepository.getInstance().getDbHelper().setTeam_base64(json.get("team_base64").toString());
+                            System.out.println(DataRepository.getInstance().getDbHelper().getTeam_base64().length());
+                        }
+
                         int count = json.get("count").getAsInt();
                         JsonArray itemArray = json.getAsJsonArray(jsonArrayKey);
 

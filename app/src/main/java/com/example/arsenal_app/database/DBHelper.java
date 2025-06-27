@@ -13,8 +13,17 @@ public class DBHelper {
     private ArrayList<EpicGame> epicGames = new ArrayList<>();
     private ArrayList<Race> races = new ArrayList<>();
     private String usid;
+    private String team_base64;
 
     public DBHelper(){
+    }
+
+    public String getTeam_base64() {
+        return team_base64;
+    }
+
+    public void setTeam_base64(String team_base64) {
+        this.team_base64 = team_base64;
     }
 
     public ArrayList<Game> getGames() {

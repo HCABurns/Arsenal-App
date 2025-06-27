@@ -11,8 +11,10 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import com.example.arsenal_app.Activities.MainActivity;
 import com.example.arsenal_app.R;
 import com.example.arsenal_app.database.DataRepository;
 import com.example.arsenal_app.database.DataStatus;
@@ -41,6 +43,7 @@ public class HomeFragment extends Fragment {
     private TextView stadiumView;
     private TextView countdownView;
     private ImageView opponentBadgeView;
+    private ImageView myTeamBadgeView;
     private ProgressBar progressBar;
 
     @Override
@@ -58,15 +61,21 @@ public class HomeFragment extends Fragment {
         stadiumView = view.findViewById(R.id.next_match_stadium);
         countdownView = view.findViewById(R.id.next_match_countdown);
         opponentBadgeView = view.findViewById(R.id.next_opponent_opponentBadge);
-
+        myTeamBadgeView = view.findViewById(R.id.logo);
         // Load the data into the page.
 
+        competitionView.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.skeleton));
+
         DataRepository.getInstance().loadAllFootballGames(
-                "https://general-personal-app.onrender.com/api/football",
+                "https://general-personal-app.onrender.com/api/football/"+DataRepository.getInstance().getSettingsManager().getTeam(),
                 "football" , Game.class,new DataStatus<Game>() {
             @Override
             public void onDataLoaded(ArrayList<Game> dataList) {
                 progressBar.setVisibility(View.GONE);
+
+                byte[] base64 = Base64.decode(DataRepository.getInstance().getDbHelper().getTeam_base64(), Base64.DEFAULT);
+                Bitmap bitmap = BitmapFactory.decodeByteArray(base64, 0, base64.length);
+                myTeamBadgeView.setImageBitmap(bitmap);
 
                 int i = 0;
                 long milliseconds = -1;
@@ -83,8 +92,8 @@ public class HomeFragment extends Fragment {
                     timeView.setText(game.getTimeFormatted());
 
                     // Convert the base 64 to a bitmap image and set.
-                    byte[] base64 = Base64.decode(game.getBadge_base64(), Base64.DEFAULT);
-                    Bitmap bitmap = BitmapFactory.decodeByteArray(base64, 0, base64.length);
+                    base64 = Base64.decode(game.getBadge_base64(), Base64.DEFAULT);
+                    bitmap = BitmapFactory.decodeByteArray(base64, 0, base64.length);
                     opponentBadgeView.setImageBitmap(bitmap);
 
                     // Find the milliseconds between next game and now.
@@ -100,7 +109,12 @@ public class HomeFragment extends Fragment {
                     String[] timeParts = game.getTime().split(":");
                     int hours = Integer.parseInt(timeParts[0]);
                     int minutes = Integer.parseInt(timeParts[1]);
-                    int seconds = Integer.parseInt(timeParts[2]);
+                    int seconds;
+                    if (timeParts.length > 2) {
+                        seconds = Integer.parseInt(timeParts[2]);
+                    }else{
+                        seconds = 0;
+                    }
 
                     milliseconds = -1;
                     if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {

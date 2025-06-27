@@ -18,9 +18,6 @@ while True:
         # Create a soup object to search using div and class tags.
         soup = bs(data, 'html.parser')
 
-        # Get the information in the div and classes required:
-        div = soup.find('div', class_='accordion__content')
-
 
         ##########################################
         # Get next X games that are to be played #
@@ -84,7 +81,7 @@ while True:
 
 
         # Get the database reference.
-        ref = db.reference()
+        ref = db.reference("games")
 
         # Titles.
         titles = "competition, opponent, date, time, stadium, badge_base64".split(", ")
@@ -95,7 +92,7 @@ while True:
             json[i] = {titles[j]:games[i][j] for j in range(len(titles))}
 
         # Update the X games to the newest information.
-        ref.update({"games":json})
+        ref.update({"arsenal":json})
         print("Successfully Updated!")
         break
     except:

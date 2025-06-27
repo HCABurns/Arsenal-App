@@ -1,0 +1,15 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory app:title="@string/team_header">
+
+        <ListPreference
+            app:defaultValue="@string/default_team"
+            app:entries="@array/default_team_entries"
+            app:entryValues="@array/default_team_values"
+            app:key="default_team"
+            app:title="@string/team_title"
+            app:useSimpleSummaryProvider="true" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>
