@@ -26,7 +26,7 @@ public class SettingsManager {
                 String newTeam = prefs.getString("default_team", null);
                 if (newTeam != null) {
                     System.out.println("Team changed to: " + newTeam);
-                    // Your logic here
+                    // Code here
                 }
             }
         };

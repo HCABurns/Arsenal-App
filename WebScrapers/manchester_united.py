@@ -69,7 +69,7 @@ while True:
         for i,img in enumerate(images[::2]):
             games[i].append(img.get('alt'))
 
-
+        badge_url="https://resources.premierleague.com/premierleague/badges/"
 
         # Parse opponent badge in base64
         team_spans = soup.find_all('span', class_='match-fixture__teams')
@@ -80,7 +80,8 @@ while True:
             for img in images:
                 src = img.get('src')
                 if src != "https://resources.premierleague.com/premierleague/badges/50/t1.png":
-                    games[i].append(str(base64.b64encode(requests.get(src).content))[:-1])
+                    ext = src.split("/")[-1]
+                    games[i].append(str(base64.b64encode(requests.get(badge_url+ext).content))[2:-1])
                     i+=1
                 if i == len(games):break
 

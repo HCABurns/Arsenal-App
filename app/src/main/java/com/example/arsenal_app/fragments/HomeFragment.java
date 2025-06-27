@@ -103,7 +103,12 @@ public class HomeFragment extends Fragment {
                     String[] timeParts = game.getTime().split(":");
                     int hours = Integer.parseInt(timeParts[0]);
                     int minutes = Integer.parseInt(timeParts[1]);
-                    int seconds = Integer.parseInt(timeParts[2]);
+                    int seconds;
+                    if (timeParts.length > 2) {
+                        seconds = Integer.parseInt(timeParts[2]);
+                    }else{
+                        seconds = 0;
+                    }
 
                     milliseconds = -1;
                     if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {

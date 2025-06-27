@@ -63,10 +63,11 @@ def initialize_firebase():
         races = get_data("f1")
         football_games = get_data("games")
         epic_games = get_data("epic_games")
-        return races, football_games, epic_games
+        logos = get_data("logos")
+        return races, football_games, epic_games, logos
     except Exception as e:
         print(f"Error occurred during Firebase initialization: {e}")
-        return [],[],[]
+        return [],[],[],[]
 
 
 def verify_firebase_token():
@@ -173,7 +174,7 @@ def get_team_games(team):
     if not uid:
         return error_response, status
     if team in football_games:
-        return {"football":football_games[team],"count":len(football_games[team])}, 200
+        return {"football":football_games[team],"count":len(football_games[team]), "team_base64":logos[team]}, 200
     else:
         jsonify({'error': 'No team found'}), 404
 
@@ -232,6 +233,6 @@ def page_not_found(e):
     return jsonify({'error': 'Unknown Request'}), 404
 
 # Get data from the database.
-races, football_games, epic_games = initialize_firebase()
+races, football_games, epic_games, logos = initialize_firebase()
 if __name__ == "__main__":
     app.run()
