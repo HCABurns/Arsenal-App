@@ -9,9 +9,11 @@ This is an Android application that will provide information about a variety of 
 * Information regarding the upcoming free games on epicgames.com
 * F1 Page to display the next F1 circuit, qualifying and sprint/race times. (22/6/25)
 * Full database access via an API requiring user authentication. (22/6/25 - 23/6/25)
+* Selecting a preference for which football team is loaded. (25/6/25 - 27/6/25)
 
 ## Planned Implementation:
 
+* Allow for reload upon pulling down. (In case of failure to load.)
 * Change from loadingBar to skeleton loaders with appropriate connection / error messages.
 * Redesign the epic game menu to be a single game with a swipe to view another game.
 * Potential for an upcoming F1 race page (Potential alter: Convert the F1 Page to include swiping for the next event).
