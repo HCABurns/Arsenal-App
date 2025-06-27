@@ -1,23 +1,14 @@
 package com.example.arsenal_app.database;
 
-import static java.security.AccessController.getContext;
-
-import android.content.SharedPreferences;
-
-import androidx.core.content.ContextCompat;
-import androidx.preference.PreferenceManager;
-
 import com.example.arsenal_app.Activities.MainActivity;
 import com.example.arsenal_app.models.Game;
 
-import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import javax.security.auth.Subject;
 
 /**
  * Singleton class responsible for coordinating data access and storage.
@@ -42,10 +33,7 @@ public class DataRepository {
     Map<String, List<DataStatus<?>>> waitingCallbacksMap = new HashMap<>();
 
     // Get preferences:
-    private SharedPreferences prefs;
-
-    // Example: get a String preference
-    String myTeam = prefs.getString("default_team", "default_value");
+    private final SettingsManager settingsManager;
 
     /**
      * Private constructor to create dbHelper and API.
@@ -53,6 +41,7 @@ public class DataRepository {
     private DataRepository() {
         dbHelper = new DBHelper();
         api = new API();
+        settingsManager = new SettingsManager();
     }
 
     /**
@@ -66,14 +55,6 @@ public class DataRepository {
         return instance;
     }
 
-    public void setPrefs(SharedPreferences prefs){
-        this.prefs = prefs;
-    }
-
-    public String getTeam(){
-        return this.myTeam;
-    }
-
     public DBHelper getDbHelper() {
         return dbHelper;
     }
@@ -81,6 +62,8 @@ public class DataRepository {
     public API getApi() {
         return api;
     }
+
+    public SettingsManager getSettingsManager(){return settingsManager;}
 
     /**
      * Loads EpicGames data, either from local cache or by making an API call.

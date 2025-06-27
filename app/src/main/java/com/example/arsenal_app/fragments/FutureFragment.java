@@ -38,7 +38,7 @@ public class FutureFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_future, container, false);
         DataRepository.getInstance().loadAllFootballGames(
-        "https://general-personal-app.onrender.com/api/football/"+DataRepository.getInstance().getTeam(),
+        "https://general-personal-app.onrender.com/api/football/"+DataRepository.getInstance().getSettingsManager().getTeam(),
                 "football" , Game.class,new DataStatus<Game>() {
             @Override
             public void onDataLoaded(ArrayList<Game> dataList) {
