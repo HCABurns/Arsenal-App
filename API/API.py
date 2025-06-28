@@ -175,6 +175,7 @@ def get_team_games(team):
     if not uid:
         return error_response, status
     football_games = get_data("games")
+    logos = get_data("logos")
     if team in football_games:
         return {"football":football_games[team],"count":len(football_games[team]), "team_base64":logos[team]}, 200
     else:
